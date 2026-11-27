@@ -1,0 +1,2052 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SF — دليل فهم كليات ونظام EELU</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f8faf9;
+            --surface: #ffffff;
+            --card: #f0f5f2;
+            --dark: #101915;
+            --text: #141e19;
+            --muted: #526059;
+            --border: rgba(20, 30, 25, 0.1);
+            --green: #1f8a5b;
+            --green-soft: rgba(31, 138, 91, 0.12);
+            --wa: #169c58;
+            --dot: rgba(20, 30, 25, 0.08);
+            --ease: cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        [data-theme="dark"] {
+            --bg: #141c19;
+            --surface: #1b2622;
+            --card: #22302a;
+            --dark: #101714;
+            --text: #eef4f0;
+            --muted: #a7b8b0;
+            --border: rgba(238, 244, 240, 0.12);
+            --green: #38c992;
+            --green-soft: rgba(56, 201, 146, 0.15);
+            --wa: #1ea962;
+            --dot: rgba(238, 244, 240, 0.06);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg);
+            background-image: radial-gradient(var(--dot) 1px, transparent 1px);
+            background-size: 22px 22px;
+            color: var(--text);
+            line-height: 1.75;
+            transition: background-color 0.35s var(--ease), color 0.35s var(--ease);
+        }
+        .wrap { max-width: 1120px; margin: 0 auto; padding: 0 22px; }
+
+        header#topHeader {
+            position: sticky; top: 0; z-index: 20;
+            background: color-mix(in srgb, var(--surface) 88%, transparent);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 0;
+            transform: translateY(0);
+            opacity: 1;
+            transition: transform 0.3s var(--ease), opacity 0.25s var(--ease);
+        }
+        body.header-lifted header#topHeader {
+            transform: translateY(-110%);
+            opacity: 0;
+            pointer-events: none;
+        }
+        .restore-header-btn {
+            position: fixed;
+            top: 14px;
+            inset-inline-end: 18px;
+            z-index: 30;
+            display: none;
+            align-items: center;
+            gap: 6px;
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--green);
+            border-radius: 999px;
+            padding: 7px 14px;
+            font-family: inherit;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+            transition: transform 0.25s var(--ease), background 0.25s var(--ease);
+        }
+        .restore-header-btn:hover { transform: translateY(-2px); background: var(--card); }
+        body.header-lifted .restore-header-btn { display: inline-flex; }
+
+        .nav-bar, .nav-right, .btns, .filters, .actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .nav-bar { justify-content: space-between; flex-wrap: nowrap; gap: 12px; }
+        .nav-right { flex-wrap: nowrap; gap: 10px; }
+        #nav .btns { flex-wrap: nowrap; gap: 4px; }
+        .brand {
+            font-size: 1.3rem; font-weight: 700; color: var(--text); text-decoration: none;
+            padding: 3px 11px; border-radius: 999px; background: var(--green-soft); border: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        nav a {
+            color: var(--muted); text-decoration: none; font-weight: 600; font-size: 0.8rem;
+            padding: 5px 6px; border-radius: 8px; white-space: nowrap;
+            transition: color 0.25s var(--ease), background 0.25s var(--ease);
+        }
+        nav a:hover { color: var(--text); background: var(--card); }
+        .chip-btn, .btn {
+            font-family: inherit; border: 1px solid var(--border); border-radius: 999px;
+            cursor: pointer; text-decoration: none; font-weight: 600;
+            transition: transform 0.25s var(--ease), opacity 0.25s var(--ease), background 0.3s var(--ease), border-color 0.25s var(--ease);
+        }
+        .chip-btn { background: var(--surface); color: var(--text); padding: 5px 11px; font-size: 0.8rem; white-space: nowrap; }
+        .theme-icon-btn { padding: 4px 10px; font-size: 0.98rem; line-height: 1.2; }
+        .chip-btn:hover, .btn:hover { transform: translateY(-2px); border-color: var(--green); }
+        .btn { border: none; border-radius: 10px; padding: 10px 18px; font-size: 0.92rem; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-sm { padding: 6px 12px; font-size: 0.82rem; border-radius: 8px; }
+        .btn-wa { background: var(--wa); color: #fff; box-shadow: 0 8px 18px rgba(22, 156, 88, 0.22); }
+        .btn-dark { background: var(--dark); color: #fff; }
+        .btn-soft { background: var(--card); color: var(--text); border: 1px solid var(--border); }
+
+        .hero { padding: 48px 0 36px; }
+        .hero-grid {
+            display: grid; grid-template-columns: 1.45fr 0.65fr; gap: 24px; align-items: center;
+            background: var(--surface); border: 1px solid var(--border); border-radius: 18px;
+            padding: 28px; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04); margin-bottom: 20px;
+        }
+        .badge {
+            display: inline-block; background: var(--green-soft); color: var(--green);
+            font-size: 0.8rem; font-weight: 700; padding: 3px 12px; border-radius: 999px; margin-bottom: 12px;
+        }
+        .hello-title {
+            font-size: clamp(1.85rem, 3.2vw, 2.45rem); font-weight: 800; line-height: 1.28;
+            letter-spacing: -0.01em; margin-bottom: 6px; color: var(--text);
+        }
+        .hello-name {
+            color: var(--green);
+            position: relative;
+            display: inline-block;
+            padding-bottom: 2px;
+            border-bottom: 3px solid color-mix(in srgb, var(--green) 42%, transparent);
+        }
+        .hello-sub {
+            font-size: 0.92rem; font-weight: 600; color: var(--green); margin-bottom: 10px;
+        }
+        .bio { color: var(--muted); font-size: 1.06rem; max-width: 640px; }
+        .bot-box {
+            background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+            padding: 16px; display: flex; flex-direction: column; align-items: center; gap: 8px;
+        }
+        .bot-btn { background: none; border: none; cursor: pointer; }
+        .bot-svg { width: 92px; height: 92px; animation: floatBot 3.4s var(--ease) infinite; }
+        .bot-btn.wave .bot-svg { animation: waveBot 0.8s var(--ease); }
+        .bot-say {
+            background: var(--surface); border: 1px solid var(--border); padding: 6px 12px;
+            border-radius: 999px; font-size: 0.82rem; font-weight: 600; text-align: center;
+            max-width: 100%; white-space: normal; line-height: 1.45;
+        }
+        @keyframes floatBot { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+        @keyframes waveBot { 0%, 100% { transform: rotate(0); } 35% { transform: rotate(-7deg); } 70% { transform: rotate(7deg); } }
+
+        .status {
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+            background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+            padding: 14px 20px; font-weight: 600;
+        }
+        .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--green); display: inline-block; margin-inline-end: 8px; box-shadow: 0 0 0 4px var(--green-soft); }
+
+        section.pad { padding: 64px 0; }
+        .alt { background: color-mix(in srgb, var(--surface) 65%, transparent); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+        h2.title { font-size: 1.75rem; margin-bottom: 6px; }
+        p.hint { color: var(--muted); font-size: 0.94rem; margin-bottom: 24px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 20px; }
+
+        .summary-panel, .calc-panel {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+            padding: 24px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03);
+        }
+        .summary-lead { color: var(--muted); font-size: 0.98rem; margin-bottom: 20px; }
+        .summary-list { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+        .summary-item {
+            background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px;
+        }
+        .summary-item strong { display: block; color: var(--text); margin-bottom: 6px; font-size: 0.98rem; }
+        .summary-item span { color: var(--muted); font-size: 0.9rem; display: block; }
+
+        .calc-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; align-items: start; }
+        .calc-controls { display: flex; flex-direction: column; gap: 14px; }
+        .calc-results { display: flex; flex-direction: column; gap: 12px; }
+        .calc-item {
+            background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+            padding: 16px; display: flex; flex-direction: column; gap: 6px;
+        }
+        .calc-item-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .calc-item p { color: var(--muted); font-size: 0.9rem; }
+        .status-pill {
+            font-size: 0.78rem; font-weight: 700; padding: 3px 10px; border-radius: 999px;
+            background: var(--green-soft); color: var(--green);
+        }
+        .status-pill.warn { background: rgba(217, 119, 6, 0.14); color: #d97706; }
+
+        .guide-card, .concept-card, .prereq-card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+            padding: 22px; display: flex; flex-direction: column; gap: 10px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.03);
+            transition: transform 0.25s var(--ease), border-color 0.25s var(--ease);
+        }
+        .guide-card:hover, .concept-card:hover, .prereq-card:hover { transform: translateY(-3px); border-color: var(--green); }
+        .guide-card p, .concept-card p, .prereq-card p { color: var(--muted); font-size: 0.92rem; }
+        .guide-bullets, .concept-bullets {
+            list-style: disc; padding-inline-start: 18px;
+            display: flex; flex-direction: column; gap: 6px;
+            color: var(--muted); font-size: 0.91rem;
+        }
+        .guide-note { margin-top: 16px; color: var(--muted); font-size: 0.86rem; }
+
+        .prereq-flow { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+        .prereq-box {
+            background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+            padding: 10px 12px; display: flex; flex-direction: column; gap: 2px;
+        }
+        .prereq-ar { font-size: 0.89rem; font-weight: 700; color: var(--text); }
+        .prereq-en { font-size: 0.79rem; font-weight: 600; color: var(--muted); direction: ltr; text-align: start; }
+        .prereq-arrow {
+            font-size: 0.82rem; font-weight: 700; color: var(--green);
+            padding-inline-start: 6px;
+        }
+
+        .course-card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+            padding: 20px; display: flex; flex-direction: column; justify-content: space-between; gap: 14px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.03);
+            transition: transform 0.25s var(--ease), border-color 0.25s var(--ease), box-shadow 0.25s var(--ease);
+        }
+        .course-card:hover { transform: translateY(-3px); border-color: var(--green); box-shadow: 0 12px 24px rgba(0, 0, 0, 0.05); }
+        .course-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .course-title-ar { font-size: 1.05rem; font-weight: 800; color: var(--text); margin-top: 8px; line-height: 1.45; }
+        .course-title-en { font-size: 0.84rem; font-weight: 700; color: var(--green); direction: ltr; text-align: start; margin-top: 2px; }
+        .course-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+        .course-list li {
+            background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+            padding: 8px 12px; display: flex; flex-direction: column; gap: 2px;
+        }
+        .course-item-ar { font-size: 0.89rem; color: var(--text); font-weight: 700; }
+        .course-item-en { font-size: 0.79rem; color: var(--muted); font-weight: 600; direction: ltr; text-align: start; }
+
+        .qa-panel {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+            padding: 24px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03);
+            display: flex; flex-direction: column; gap: 16px;
+        }
+        .qa-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+        .qa-chip {
+            background: var(--card); color: var(--text); border: 1px solid var(--border);
+            padding: 6px 13px; border-radius: 999px; font-family: inherit; font-size: 0.84rem;
+            font-weight: 600; cursor: pointer; transition: border-color 0.25s var(--ease), transform 0.25s var(--ease);
+        }
+        .qa-chip:hover { border-color: var(--green); transform: translateY(-1px); }
+        .qa-row { display: flex; gap: 10px; align-items: stretch; flex-wrap: wrap; }
+        .qa-row input { flex: 1 1 240px; }
+        .qa-answer {
+            background: var(--card); border: 1px solid var(--border); border-inline-start: 4px solid var(--green);
+            border-radius: 12px; padding: 16px; color: var(--text); white-space: pre-line; font-size: 0.94rem;
+        }
+
+        .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; }
+        .search-box { max-width: 300px; flex: 1 1 220px; }
+        .branch-card, .note-card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+            padding: 20px; display: flex; flex-direction: column; justify-content: space-between; gap: 14px;
+            transition: transform 0.25s var(--ease), border-color 0.25s var(--ease);
+        }
+        .branch-card:hover, .note-card:hover { transform: translateY(-3px); border-color: var(--green); }
+        .branch-card p, .note-card p { color: var(--muted); font-size: 0.92rem; white-space: pre-line; }
+        .note-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+        .note-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .note-box {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+            padding: 20px; margin-top: 24px; display: flex; flex-direction: column; gap: 14px;
+        }
+        .note-box-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .note-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+        .roadmap-step {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+            padding: 22px; display: flex; flex-direction: column; gap: 8px;
+            transition: transform 0.25s var(--ease), border-color 0.25s var(--ease);
+        }
+        .roadmap-step:hover { transform: translateY(-3px); border-color: var(--green); }
+        .step-num {
+            display: inline-block; width: fit-content; background: var(--green-soft); color: var(--green);
+            font-size: 0.8rem; font-weight: 700; padding: 2px 10px; border-radius: 999px;
+        }
+        .roadmap-step p { color: var(--muted); font-size: 0.93rem; }
+
+        .faq-list { display: flex; flex-direction: column; gap: 12px; }
+        details.faq-item {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+            padding: 16px 20px; transition: border-color 0.25s var(--ease);
+        }
+        details.faq-item[open] { border-color: var(--green); }
+        details.faq-item summary {
+            cursor: pointer; font-weight: 700; font-size: 1rem; list-style: none;
+            display: flex; justify-content: space-between; align-items: center; gap: 12px;
+        }
+        details.faq-item summary::-webkit-details-marker { display: none; }
+        details.faq-item summary::after { content: "+"; color: var(--green); font-size: 1.2rem; font-weight: 700; }
+        details.faq-item[open] summary::after { content: "−"; }
+        details.faq-item p { color: var(--muted); font-size: 0.94rem; margin-top: 10px; }
+
+        .card {
+            background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--green);
+            border-radius: 14px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; gap: 14px;
+            text-align: inherit; font-family: inherit; cursor: pointer; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.03);
+            transition: transform 0.3s var(--ease), border-color 0.3s var(--ease), box-shadow 0.3s var(--ease);
+        }
+        .card:hover { transform: translateY(-4px); border-color: var(--green); box-shadow: 0 14px 26px rgba(0, 0, 0, 0.06); }
+        .card p { color: var(--muted); font-size: 0.94rem; }
+        .more { color: var(--green); font-weight: 700; font-size: 0.9rem; transition: transform 0.25s var(--ease); }
+        .card:hover .more { transform: translateX(-4px); }
+        html[dir="ltr"] .card:hover .more { transform: translateX(4px); }
+        .tag { background: var(--green-soft); color: var(--green); padding: 3px 10px; border-radius: 999px; font-size: 0.78rem; font-weight: 700; width: fit-content; }
+        .filter-btn { background: var(--surface); color: var(--muted); border: 1px solid var(--border); padding: 6px 14px; border-radius: 999px; font-family: inherit; font-weight: 600; font-size: 0.84rem; cursor: pointer; transition: all 0.25s var(--ease); }
+        .filter-btn.active, .filter-btn:hover { background: var(--green); color: #fff; border-color: var(--green); }
+
+        .contact-grid { display: grid; grid-template-columns: 1fr 1.25fr; gap: 28px; align-items: start; }
+        .direct-box, .form-box {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px;
+            display: flex; flex-direction: column; gap: 14px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03);
+        }
+        label { font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 5px; }
+        input, select, textarea {
+            width: 100%; font-family: inherit; font-size: 0.95rem; padding: 10px 12px;
+            border: 1px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text);
+            transition: border-color 0.25s var(--ease);
+        }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--green); }
+        textarea { min-height: 100px; resize: vertical; }
+        .auto-reply {
+            background: var(--green-soft); border: 1px solid color-mix(in srgb, var(--green) 35%, transparent);
+            border-radius: 12px; padding: 14px 16px; display: none; flex-direction: column; gap: 4px;
+        }
+        .auto-reply.show { display: flex; }
+        .auto-reply strong { color: var(--green); font-size: 0.92rem; }
+        .auto-reply p { color: var(--text); font-size: 0.92rem; }
+        .feedback { color: var(--green); font-weight: 600; font-size: 0.9rem; min-height: 22px; }
+
+        footer { padding: 12px 0 32px; }
+        .foot-bar {
+            background: var(--dark); color: #dce3df; border-radius: 14px; padding: 18px 24px;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 0.9rem;
+        }
+        .foot-bar a { color: #fff; text-decoration: none; font-weight: 600; }
+
+        .modal {
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.62); backdrop-filter: blur(4px);
+            display: none; align-items: center; justify-content: center; padding: 16px; z-index: 50;
+        }
+        .modal.open { display: flex; }
+        .modal-card {
+            background: var(--surface); color: var(--text); border: 1px solid var(--border);
+            border-radius: 16px; max-width: 460px; width: 100%; padding: 26px; position: relative;
+        }
+        .close-btn {
+            position: absolute; top: 14px; inset-inline-end: 14px; width: 32px; height: 32px;
+            border-radius: 50%; border: 1px solid var(--border); background: var(--card); color: var(--text); cursor: pointer; font-size: 1.1rem;
+        }
+        .modal-card p { color: var(--muted); margin: 10px 0 20px; }
+
+        @media (max-width: 1120px) {
+            .nav-bar { flex-wrap: wrap; gap: 8px; }
+            .nav-right { flex-wrap: wrap; width: 100%; justify-content: space-between; gap: 8px; }
+            #nav .btns { flex-wrap: wrap; gap: 4px; }
+        }
+        @media (max-width: 768px) {
+            .hero { padding: 28px 0 24px; }
+            .hero-grid { padding: 20px; gap: 16px; }
+            .contact-grid, .note-form-grid, .calc-grid { grid-template-columns: 1fr; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            *, *::before, *::after { animation: none !important; transition-duration: 0.01ms !important; }
+        }
+    </style>
+</head>
+<body>
+    <button type="button" class="restore-header-btn" id="restoreHeaderBtn" onclick="setHeaderLifted(false)" data-i18n="showHeaderBtn">
+        ↓ إظهار الشريط
+    </button>
+
+    <header id="topHeader">
+        <div class="wrap nav-bar">
+            <a href="#" class="brand" dir="ltr">SF</a>
+            <div class="nav-right">
+                <nav id="nav">
+                    <div class="btns">
+                        <a href="#eelu" data-i18n="navEelu">عن EELU</a>
+                        <a href="#concepts" data-i18n="navConcepts">مفاهيم الكلية</a>
+                        <a href="#guide" data-i18n="navGuide">تالتة ثانوي</a>
+                        <a href="#courses" data-i18n="navCourses">المواد</a>
+                        <a href="#prereqs" data-i18n="navPrereqs">خريطة المواد</a>
+                        <a href="#calc" data-i18n="navCalc">المصروفات</a>
+                        <a href="#askBot" data-i18n="navAsk">المجيب</a>
+                        <a href="#branches" data-i18n="navBranches">الفروع</a>
+                        <a href="#notes" data-i18n="navNotes">الملخصات</a>
+                        <a href="#contact" data-i18n="navContact">تواصل</a>
+                    </div>
+                </nav>
+                <div class="btns">
+                    <button type="button" class="chip-btn" id="liftBtn" onclick="toggleHeaderLift()" data-i18n="liftHeaderBtn">↑ رفع الشريط</button>
+                    <button type="button" class="chip-btn" id="langBtn" onclick="toggleLang()">English</button>
+                    <button type="button" class="chip-btn theme-icon-btn" id="themeBtn" onclick="toggleTheme()" aria-label="الوضع الليلي" title="الوضع الليلي">☾</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="wrap">
+                <div class="hero-grid">
+                    <div>
+                        <span class="badge" data-i18n="badge">دليل EELU • الكليات • نظام الدراسة</span>
+                        <h1 class="hello-title"><span data-i18n="helloPrefix">أهلًا، أنا</span> <span class="hello-name" data-i18n="helloName">سيف</span></h1>
+                        <div class="hello-sub" data-i18n="helloSub">أساعدك تفهم كليات ونظام الجامعة المصرية للتعلم الإلكتروني الأهلية EELU</div>
+                        <p class="bio" data-i18n="bio">أساعدك تفهم عن كلية وبرامج EELU ونظام التعلم المدمج والساعات المعتمدة والامتحانات والمواد المتطلبة والتنسيق والتقديم بشكل واضح.</p>
+                    </div>
+                    <div class="bot-box">
+                        <button type="button" class="bot-btn" id="botBtn" onclick="talkBot()" aria-label="Robot">
+                            <svg class="bot-svg" viewBox="0 0 120 120" fill="none">
+                                <line x1="60" y1="12" x2="60" y2="30" stroke="var(--green)" stroke-width="4" stroke-linecap="round"/>
+                                <circle cx="60" cy="10" r="6" fill="#34d399"/>
+                                <rect x="26" y="30" width="68" height="50" rx="15" fill="var(--surface)" stroke="var(--green)" stroke-width="3"/>
+                                <circle cx="46" cy="54" r="6.5" fill="var(--green)"/>
+                                <circle cx="74" cy="54" r="6.5" fill="var(--green)"/>
+                                <rect x="45" y="66" width="30" height="5" rx="2.5" fill="var(--green)"/>
+                                <rect x="38" y="84" width="44" height="20" rx="8" fill="var(--surface)" stroke="var(--green)" stroke-width="3"/>
+                            </svg>
+                        </button>
+                        <div class="bot-say" id="botSay" data-i18n="botIdle">اضغط عليّ! أنا مساعد SF</div>
+                    </div>
+                </div>
+                <div class="status">
+                    <span><span class="dot"></span><span data-i18n="status">الحالة: متاح للإجابة عن استفسارات EELU</span></span>
+                    <div class="btns">
+                        <a href="#" id="heroWa" target="_blank" rel="noopener noreferrer" class="btn btn-wa" data-i18n="waBtn">واتساب مباشر</a>
+                        <a href="#contact" class="btn btn-dark" data-i18n="msgBtn">اكتب رسالة</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="pad" id="eelu">
+            <div class="wrap">
+                <h2 class="title" data-i18n="eeluTitle">ملخص عن جامعة EELU</h2>
+                <p class="hint" data-i18n="eeluHint">طلاب EELU والفروع — جامعة معتمدة بنظام التعلم المدمج</p>
+                <div class="summary-panel">
+                    <p class="summary-lead" data-i18n="eeluLead">الجامعة المصرية للتعلم الإلكتروني الأهلية (EELU) جامعة أهلية معتمدة من وزارة التعليم العالي والبحث العلمي والمجلس الأعلى للجامعات، وتخدم طلاب EELU عبر فروع ومراكز دراسية في المحافظات بنظام التعلم المدمج بين المنصات الرقمية والتعلم الذاتي.</p>
+                    <ul class="summary-list">
+                        <li class="summary-item">
+                            <strong data-i18n="eeluPoint1Title">طلاب EELU والفروع</strong>
+                            <span data-i18n="eeluPoint1Desc">يتابع طلاب EELU محاضراتهم ومحتواهم الإلكتروني مع الاستفادة من الفروع والمراكز الدراسية في المحافظات وشهاداتها المعتمدة رسميًا.</span>
+                        </li>
+                        <li class="summary-item">
+                            <strong data-i18n="eeluPoint2Title">الحاسبات وتكنولوجيا المعلومات</strong>
+                            <span data-i18n="eeluPoint2Desc">تمنح درجة البكالوريوس المعتمدة في تخصصات تكنولوجيا المعلومات والذكاء الاصطناعي وعلوم البيانات مع التركيز على التطبيق العملي.</span>
+                        </li>
+                        <li class="summary-item">
+                            <strong data-i18n="eeluPoint3Title">إدارة الأعمال والدراسات التربوية</strong>
+                            <span data-i18n="eeluPoint3Desc">تضم برامج معتمدة في إدارة الأعمال والتخصصات التجارية، إضافة إلى برامج الدراسات التربوية وتكنولوجيا التعليم.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="pad alt" id="concepts">
+            <div class="wrap">
+                <h2 class="title" data-i18n="conceptsTitle">مفاهيم جامعية قد تبدو غامضة في البداية</h2>
+                <p class="hint" data-i18n="conceptsHint">شرح مبسّط للساعات المعتمدة، نظام الامتحانات، والمواد المتطلبة التي تفتح أو تقفل مواد أخرى</p>
+                <div class="grid">
+                    <article class="concept-card">
+                        <span class="step-num" data-i18n="cp1Tag">01 • الساعات المعتمدة</span>
+                        <h3 data-i18n="cp1Title">ما معنى الساعات المعتمدة (Credit Hours)؟</h3>
+                        <p data-i18n="cp1Desc">بدلًا من نظام السنوات المغلق، تقيس الساعات المعتمدة وزن كل مادة وساعات تدريسها وتحدد تقدمك نحو التخرج:</p>
+                        <ul class="concept-bullets">
+                            <li data-i18n="cp1B1">غالبًا تكون المادة 3 ساعات معتمدة، ويتحدد عدد الساعات التي تسجلها في الفصل الدراسي حسب لائحة الكلية ومعدلك التراكمي (GPA).</li>
+                            <li data-i18n="cp1B2">المواد ذات الساعات الأعلى يكون تأثيرها أكبر على حساب المعدل الفصلي والتراكمي.</li>
+                            <li data-i18n="cp1B3">التخرج يتطلب إتمام إجمالي الساعات المعتمدة المطلوبة للبرنامج بنجاح.</li>
+                        </ul>
+                    </article>
+
+                    <article class="concept-card">
+                        <span class="step-num" data-i18n="cp2Tag">02 • نظام الامتحانات</span>
+                        <h3 data-i18n="cp2Title">كيف تُحسب الدرجات والامتحانات؟</h3>
+                        <p data-i18n="cp2Desc">التقييم في الجامعة يعتمد على متابعة مستمرة وليس امتحانًا واحدًا فقط في نهاية الترم:</p>
+                        <ul class="concept-bullets">
+                            <li data-i18n="cp2B1">تتوزع الدرجة غالبًا بين أعمال السنة (كويزات، واجبات، مشاريع أو تطبيقات عملية) والاختبارات المقررة في اللوائح.</li>
+                            <li data-i18n="cp2B2">الالتزام بتسليم المهام والأنشطة على المنصة يحمي درجتك ويقلل الضغط وقت الامتحانات النهائية.</li>
+                            <li data-i18n="cp2B3">في حال الرسوب في مادة، تُعاد دراستها أو اختبارها وفق لائحة الكلية ويظهر أثرها في المعدل حسب القواعد المعتمدة.</li>
+                        </ul>
+                    </article>
+
+                    <article class="concept-card">
+                        <span class="step-num" data-i18n="cp3Tag">03 • المواد التي تقفل مواد</span>
+                        <h3 data-i18n="cp3Title">ما هي المتطلبات السابقة (Prerequisites)؟</h3>
+                        <p data-i18n="cp3Desc">بعض المواد تكون «متطلبًا سابقًا» لمواد أخرى؛ أي أن عدم اجتيازها يقفل عليك فتح المواد التي تعتمد عليها:</p>
+                        <ul class="concept-bullets">
+                            <li data-i18n="cp3B1">مثال شائع: مادة برمجة أساسية قد تقفل مادة «هياكل البيانات»، أو مادة «قواعد البيانات» تقفل مادة متقدمة تعتمد عليها.</li>
+                            <li data-i18n="cp3B2">تأجيل أو الرسوب في مادة متطلبة قد يؤخر فتح مادة لاحقة في الترم التالي إذا كانت شرطًا للتسجيل.</li>
+                            <li data-i18n="cp3B3">مراجعة شجرة المواد (Course Prerequisites) قبل تسجيل كل ترم تجنّبك أي تعطل في الخطة الدراسية.</li>
+                        </ul>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="pad" id="guide">
+            <div class="wrap">
+                <h2 class="title" data-i18n="guideTitle">إرشادات لطلاب تالتة ثانوي عن EELU</h2>
+                <p class="hint" data-i18n="guideHint">كل ما يهم طالب الثانوية العامة معرفته قبل التقديم: الحدود الدنيا، المصروفات، الكليات، خطوات التقديم، والمنح</p>
+                <div class="grid">
+                    <article class="guide-card">
+                        <span class="step-num" data-i18n="g1Tag">التنسيق والمصروفات</span>
+                        <h3 data-i18n="g1Title">مؤشرات القبول والمصروفات (2026/2027)</h3>
+                        <p data-i18n="g1Desc">الحدود الدنيا المعلنة لعام 2026/2027 ومصروفات البرامج السنوية التقريبية:</p>
+                        <ul class="guide-bullets">
+                            <li data-i18n="g1B1">حاسبات وتكنولوجيا المعلومات: حد أدنى 61% — نحو 61,868 جنيه (علمي رياضة) و64,268 جنيه (علمي علوم).</li>
+                            <li data-i18n="g1B2">إدارة الأعمال: حد أدنى 53% — نحو 48,612 جنيه سنويًا.</li>
+                            <li data-i18n="g1B3">الشهادة معتمدة من المجلس الأعلى للجامعات وتعادل نظيراتها الحكومية.</li>
+                        </ul>
+                    </article>
+                    <article class="guide-card">
+                        <span class="step-num" data-i18n="g2Tag">الكليات ونظام الدراسة</span>
+                        <h3 data-i18n="g2Title">كيف تدرس وكيف تختار كليتك؟</h3>
+                        <p data-i18n="g2Desc">الدراسة تجمع بين المنصة الإلكترونية والمحتوى التفاعلي والمتابعة والأنشطة في الفروع:</p>
+                        <ul class="guide-bullets">
+                            <li data-i18n="g2B1">الحاسبات وتكنولوجيا المعلومات (تكنولوجيا المعلومات، الذكاء الاصطناعي، علوم البيانات) للشعب العلمية والشهادات المعادلة.</li>
+                            <li data-i18n="g2B2">إدارة الأعمال (محاسبة، تسويق، تمويل واستثمار، سلاسل إمداد، نظم معلومات إدارية) لعلمي وأدبي والشهادات المعادلة.</li>
+                            <li data-i18n="g2B3">مرونة التعلم المدمج تمنحك وقتًا للتدريب العملي والبرمجة بجانب المقررات.</li>
+                        </ul>
+                    </article>
+                    <article class="guide-card">
+                        <span class="step-num" data-i18n="g3Tag">التقديم والمنح</span>
+                        <h3 data-i18n="g3Title">خطوات التقديم والمنح الدراسية</h3>
+                        <p data-i18n="g3Desc">استعد مبكرًا وجهّز أوراقك واطّلع على برامج الدعم والمنح المتاحة:</p>
+                        <ul class="guide-bullets">
+                            <li data-i18n="g3B1">إنشاء حساب على بوابة التقديم الإلكترونية للجامعة وتفعيل الرابط المرسل على البريد الإلكتروني.</li>
+                            <li data-i18n="g3B2">منح وتخفيضات وفق الضوابط المعلنة (مثل أوائل الثانوية وSTEM، التفوق الأكاديمي أو الرياضي، والحالات الخاصة).</li>
+                            <li data-i18n="g3B3">يمكنك الاستفسار عن الخط الساخن 16541 أو إرسال سؤالك هنا مباشرة.</li>
+                        </ul>
+                        <div>
+                            <button type="button" class="btn btn-soft" onclick="askGuideQuestion()" data-i18n="gAskBtn">اسأل عن التقديم والمنح</button>
+                        </div>
+                    </article>
+                </div>
+                <p class="guide-note" data-i18n="gNote">تنويه: الأرقام المذكورة وفق المعلن لعام 2026/2027 وقد تختلف تفاصيل المصروفات أو الضوابط من عام لآخر؛ راجع الإعلانات الرسمية للجامعة قبل السداد.</p>
+            </div>
+        </section>
+
+        <section class="pad alt" id="courses">
+            <div class="wrap">
+                <h2 class="title" data-i18n="coursesTitle">المواد والمقررات الدراسية في EELU</h2>
+                <p class="hint" data-i18n="coursesHint">كل مادة معروضة بالعربي والإنجليزي معاً — من سنة أولى إلى سنة رابعة والتخصصات الدقيقة والمتطلبات العامة</p>
+                <div class="toolbar">
+                    <div class="filters">
+                        <button type="button" class="filter-btn active" onclick="setCourseCat('all', this)" data-i18n="cAll">الكل</button>
+                        <button type="button" class="filter-btn" onclick="setCourseCat('y1', this)" data-i18n="cY1">سنة أولى</button>
+                        <button type="button" class="filter-btn" onclick="setCourseCat('y2', this)" data-i18n="cY2">سنة تانية</button>
+                        <button type="button" class="filter-btn" onclick="setCourseCat('y3', this)" data-i18n="cY3">سنة تالتة</button>
+                        <button type="button" class="filter-btn" onclick="setCourseCat('y4', this)" data-i18n="cY4">سنة رابعة</button>
+                        <button type="button" class="filter-btn" onclick="setCourseCat('it', this)" data-i18n="cIt">حاسبات وتكنولوجيا المعلومات</button>
+                        <button type="button" class="filter-btn" onclick="setCourseCat('bus', this)" data-i18n="cBus">إدارة الأعمال</button>
+                        <button type="button" class="filter-btn" onclick="setCourseCat('gen', this)" data-i18n="cGen">متطلبات عامة</button>
+                    </div>
+                </div>
+                <div class="grid" id="coursesGrid"></div>
+            </div>
+        </section>
+
+        <section class="pad" id="prereqs">
+            <div class="wrap">
+                <h2 class="title" data-i18n="prereqsTitle">خريطة المواد التي تقفل أو تفتح مواد أخرى</h2>
+                <p class="hint" data-i18n="prereqsHint">أمثلة عملية بالاسم العربي والإنجليزي لمسارات الاعتماد بين المواد في الكلية</p>
+                <div class="grid" id="prereqsGrid"></div>
+            </div>
+        </section>
+
+        <section class="pad alt" id="eeluHelp">
+            <div class="wrap">
+                <h2 class="title" data-i18n="workTitle">كيف أساعدك تفهم عن EELU</h2>
+                <p class="hint" data-i18n="workHint">اضغط على أي بطاقة لعرض التفاصيل والانتقال للاستفسار أو الحاسبة</p>
+                <div class="grid">
+                    <button type="button" class="card" onclick="openSrv('code', this)">
+                        <div>
+                            <h3 data-i18n="s1t">فهم كليات وتخصصات EELU</h3>
+                            <p data-i18n="s1d">أوضح لك الفرق بين برامج الحاسبات وتكنولوجيا المعلومات وإدارة الأعمال والدراسات التربوية.</p>
+                        </div>
+                        <span class="more" data-i18n="more">اعرف أكثر ←</span>
+                    </button>
+                    <button type="button" class="card" onclick="openSrv('ai', this)">
+                        <div>
+                            <h3 data-i18n="s2t">شرح نظام الدراسة المدمج والفروع</h3>
+                            <p data-i18n="s2d">أشرح لك كيف تعمل المنصة الإلكترونية والمراكز والفروع في المحافظات والامتحانات والساعات المعتمدة.</p>
+                        </div>
+                        <span class="more" data-i18n="more">اعرف أكثر ←</span>
+                    </button>
+                    <button type="button" class="card" onclick="openSrv('study', this)">
+                        <div>
+                            <h3 data-i18n="s3t">دليل التنسيق والمصروفات والتقديم</h3>
+                            <p data-i18n="s3d">أساعدك تفهم الحدود الدنيا والمصروفات السنوية التقريبية والمنح وخطوات التقديم لطلاب تالتة ثانوي.</p>
+                        </div>
+                        <span class="more" data-i18n="more">اعرف أكثر ←</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="pad" id="calc">
+            <div class="wrap">
+                <h2 class="title" data-i18n="calcTitle">حاسبة التنسيق والمصروفات التقديرية</h2>
+                <p class="hint" data-i18n="calcHint">اختر الشعبة واكتب نسبتك المئوية لتعرف موقفك من الحدود الدنيا والمصروفات السنوية التقريبية (2026/2027)</p>
+                <div class="calc-panel">
+                    <div class="calc-grid">
+                        <div class="calc-controls">
+                            <div>
+                                <label for="calcTrack" data-i18n="calcTrackLbl">الشعبة الدراسية</label>
+                                <select id="calcTrack" onchange="renderCalc()">
+                                    <option value="sci_math" data-i18n="trMath">علمي رياضة</option>
+                                    <option value="sci_bio" data-i18n="trBio">علمي علوم</option>
+                                    <option value="arts" data-i18n="trArts">أدبي</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="calcPct" data-i18n="calcPctLbl">النسبة المئوية (%)</label>
+                                <input id="calcPct" type="number" min="0" max="100" step="0.1" value="65" oninput="renderCalc()">
+                            </div>
+                            <div class="actions">
+                                <button type="button" class="btn btn-soft" onclick="sendCalcToContact()" data-i18n="calcSendBtn">أرسل النتيجة لسيف</button>
+                            </div>
+                        </div>
+                        <div class="calc-results" id="calcResults" aria-live="polite"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="pad alt" id="askBot">
+            <div class="wrap">
+                <h2 class="title" data-i18n="qaTitle">اسأل المجيب التلقائي في أي حاجة</h2>
+                <p class="hint" data-i18n="qaHint">اكتب سؤالك عن الكلية أو المواد أو الساعات المعتمدة أو الامتحانات أو المواد المتطلبة والتنسيق والمصروفات وهيرد عليك فورًا</p>
+                <div class="qa-panel">
+                    <div class="qa-chips">
+                        <button type="button" class="qa-chip" onclick="presetAsk(0)" data-i18n="qaChip1">ما هي الساعات المعتمدة وكيف تعمل؟</button>
+                        <button type="button" class="qa-chip" onclick="presetAsk(1)" data-i18n="qaChip2">ما هي المواد التي تقفل مواد أخرى؟</button>
+                        <button type="button" class="qa-chip" onclick="presetAsk(2)" data-i18n="qaChip3">كيف نظام الامتحانات والدرجات؟</button>
+                        <button type="button" class="qa-chip" onclick="presetAsk(3)" data-i18n="qaChip4">ما هو تنسيق ومصاريف الكلية؟</button>
+                    </div>
+                    <form class="qa-row" onsubmit="handleInstantAsk(event)">
+                        <input id="instantQuestion" type="text" data-i18n-placeholder="qaInputPh" placeholder="اكتب سؤالك هنا... مثال: يعني إيه ساعات معتمدة؟ أو إيه المواد اللي بتقفل مواد؟ أو إزاي الامتحانات؟">
+                        <button type="submit" class="btn btn-wa" data-i18n="qaBtn">رد الآن</button>
+                    </form>
+                    <div class="qa-answer" id="instantAnswer" aria-live="polite"></div>
+                    <div class="actions">
+                        <button type="button" class="btn btn-soft" onclick="sendQaToContact()" data-i18n="qaSendContact">أرسل السؤال لسيف</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="pad" id="branches">
+            <div class="wrap">
+                <h2 class="title" data-i18n="branchesTitle">فروع ومراكز EELU بالمحافظات</h2>
+                <p class="hint" data-i18n="branchesHint">ابحث عن فرعك أو اختره لإرسال رسالة سريعة بخصوصه</p>
+                <div class="toolbar">
+                    <div class="search-box">
+                        <input id="branchSearch" type="search" oninput="renderBranches()" data-i18n-placeholder="branchSearchPh" placeholder="ابحث باسم المحافظة أو الفرع...">
+                    </div>
+                </div>
+                <div class="grid" id="branchesGrid"></div>
+            </div>
+        </section>
+
+        <section class="pad alt" id="notes">
+            <div class="wrap">
+                <h2 class="title" data-i18n="notesTitle">ملاحظات وملخصات عن EELU</h2>
+                <p class="hint" data-i18n="notesHint">الصق أي نص أو إعلان أو شرح وسيقوم الملخّص التلقائي باستخراج أهم النقاط لوحده، مع إمكانية النسخ أو الحذف</p>
+                <div class="toolbar">
+                    <div class="filters">
+                        <button type="button" class="filter-btn active" onclick="setNoteCat('all', this)" data-i18n="fAll">الكل</button>
+                        <button type="button" class="filter-btn" onclick="setNoteCat('code', this)" data-i18n="fCode">تكنولوجيا المعلومات</button>
+                        <button type="button" class="filter-btn" onclick="setNoteCat('math', this)" data-i18n="fMath">إدارة الأعمال</button>
+                        <button type="button" class="filter-btn" onclick="setNoteCat('ai', this)" data-i18n="fAi">النظام والمنح</button>
+                    </div>
+                    <span class="feedback" id="noteActionFb"></span>
+                </div>
+                <div class="grid" id="notesGrid"></div>
+
+                <form class="note-box" onsubmit="addNote(event)">
+                    <div class="note-box-head">
+                        <h3 data-i18n="addNoteTitle">ملخّص تلقائي لأي نص</h3>
+                        <button type="button" class="btn btn-soft" onclick="autoSummarizeInput()" data-i18n="autoSumBtn">لخّص تلقائيًا</button>
+                    </div>
+                    <div class="note-form-grid">
+                        <div>
+                            <label for="noteSubject" data-i18n="noteSubLbl">العنوان / الموضوع</label>
+                            <input id="noteSubject" type="text" required>
+                        </div>
+                        <div>
+                            <label for="noteCat" data-i18n="topicLbl">الموضوع</label>
+                            <select id="noteCat">
+                                <option value="code" data-i18n="fCode">تكنولوجيا المعلومات</option>
+                                <option value="math" data-i18n="fMath">إدارة الأعمال</option>
+                                <option value="ai" data-i18n="fAi">النظام والمنح</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="noteBody" data-i18n="noteBodyLbl">النص أو الملخص</label>
+                        <textarea id="noteBody" required></textarea>
+                    </div>
+                    <div class="actions">
+                        <button type="submit" class="btn btn-wa" data-i18n="saveNoteBtn">حفظ الملخص</button>
+                        <span class="feedback" id="noteFb"></span>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <section class="pad" id="roadmap">
+            <div class="wrap">
+                <h2 class="title" data-i18n="roadmapTitle">خطوات فهم الكلية والالتحاق بها</h2>
+                <p class="hint" data-i18n="roadmapHint">رحلة واضحة من التعرف على التخصصات حتى التقديم وبداية الدراسة</p>
+                <div class="grid">
+                    <div class="roadmap-step">
+                        <span class="step-num" data-i18n="step1Tag">الخطوة 01</span>
+                        <h3 data-i18n="step1Title">اختيار الكلية والتخصص</h3>
+                        <p data-i18n="step1Desc">المقارنة بين الحاسبات وتكنولوجيا المعلومات وإدارة الأعمال حسب شعبتك وميولك.</p>
+                    </div>
+                    <div class="roadmap-step">
+                        <span class="step-num" data-i18n="step2Tag">الخطوة 02</span>
+                        <h3 data-i18n="step2Title">مراجعة التنسيق والمصروفات</h3>
+                        <p data-i18n="step2Desc">التحقق من الحد الأدنى المعلن والمصروفات التقريبية والمنح المتاحة واختيار الفرع المناسب.</p>
+                    </div>
+                    <div class="roadmap-step">
+                        <span class="step-num" data-i18n="step3Tag">الخطوة 03</span>
+                        <h3 data-i18n="step3Title">التقديم وبداية التعلم المدمج</h3>
+                        <p data-i18n="step3Desc">إتمام التسجيل الإلكتروني والتأقلم مع المنصة الرقمية ومتابعة الفروع في محافظتك.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="pad alt" id="faq">
+            <div class="wrap">
+                <h2 class="title" data-i18n="faqTitle">الأسئلة الشائعة عن EELU</h2>
+                <p class="hint" data-i18n="faqHint">إجابات مختصرة عن طلاب EELU والفروع والاعتماد ونظام الدراسة</p>
+                <div class="faq-list">
+                    <details class="faq-item">
+                        <summary data-i18n="faq1Q">هل جامعة EELU وشهاداتها معتمدة؟</summary>
+                        <p data-i18n="faq1A">نعم، الجامعة المصرية للتعلم الإلكتروني الأهلية وبرامج البكالوريوس فيها معتمدة من وزارة التعليم العالي والبحث العلمي والمجلس الأعلى للجامعات.</p>
+                    </details>
+                    <details class="faq-item">
+                        <summary data-i18n="faq2Q">كيف يدرس طلاب EELU وما دور الفروع؟</summary>
+                        <p data-i18n="faq2A">يدرس طلاب EELU بنظام التعلم المدمج الذي يجمع بين المحاضرات والمنصات الإلكترونية والتعلم الذاتي مع المتابعة والأنشطة في الفروع والمراكز الدراسية بالمحافظات.</p>
+                    </details>
+                    <details class="faq-item">
+                        <summary data-i18n="faq3Q">ما أبرز التخصصات المتاحة في الحاسبات وتكنولوجيا المعلومات؟</summary>
+                        <p data-i18n="faq3A">تضم مسارات تكنولوجيا المعلومات (IT) والذكاء الاصطناعي وعلوم البيانات، مع التركيز على الجمع بين الأساس الأكاديمي والتطبيق العملي.</p>
+                    </details>
+                    <details class="faq-item">
+                        <summary data-i18n="faq4Q">كيف يناسب هذا النظام الطلاب المهتمين بالبرمجة والتطبيق العملي؟</summary>
+                        <p data-i18n="faq4A">مرونة تنظيم الوقت في التعلم المدمج تساعد الطالب على تخصيص وقت مستمر لكتابة الكود، حل المسائل، وبناء مشاريع عملية بجانب المقررات.</p>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <section class="pad" id="contact">
+            <div class="wrap">
+                <div class="contact-grid">
+                    <div>
+                        <h2 class="title" data-i18n="cTitle">تواصل معي</h2>
+                        <p class="hint" data-i18n="cHint">محتاج توضيح أكتر عن كلية EELU، التخصصات، المصروفات، الفروع، أو خطوات التقديم؟ ابعتلي سؤالك وهرد عليك في أقرب وقت.</p>
+                        <div class="direct-box">
+                            <div><strong data-i18n="waLbl">واتساب:</strong> <span id="waText" dir="ltr"></span></div>
+                            <div><strong data-i18n="emLbl">البريد الإلكتروني:</strong> <span id="emText" dir="ltr"></span></div>
+                        </div>
+                    </div>
+                    <form class="form-box" onsubmit="sendDirectWa(event)">
+                        <div>
+                            <label for="name" data-i18n="nameLbl">الاسم</label>
+                            <input id="name" type="text" required>
+                        </div>
+                        <div>
+                            <label for="topic" data-i18n="topicLbl">الموضوع</label>
+                            <select id="topic" onchange="refreshAutoReply()">
+                                <option value="code" data-i18n="s1t">فهم كليات وتخصصات EELU</option>
+                                <option value="ai" data-i18n="s2t">شرح نظام الدراسة المدمج والفروع</option>
+                                <option value="study" data-i18n="s3t">دليل التنسيق والمصروفات والتقديم</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="msg" data-i18n="msgLbl">الرسالة</label>
+                            <textarea id="msg" required></textarea>
+                        </div>
+                        <div class="actions">
+                            <button type="submit" id="waSubmitBtn" class="btn btn-wa" data-i18n="sendWa">إرسال عبر واتساب</button>
+                            <button type="button" class="btn btn-dark" onclick="sendMail()" data-i18n="sendMail">إرسال عبر Gmail</button>
+                            <button type="button" class="btn btn-soft" onclick="copyMsg()" data-i18n="copy">نسخ الرسالة</button>
+                        </div>
+                        <div class="auto-reply" id="autoReplyBox" aria-live="polite">
+                            <strong data-i18n="autoReplyTitle">رد تلقائي قريب:</strong>
+                            <p id="autoReplyText"></p>
+                        </div>
+                        <div class="feedback" id="fb"></div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="wrap">
+            <div class="foot-bar">
+                <span data-i18n="copyRight">© 2026 SF. جميع الحقوق محفوظة.</span>
+                <a href="#" id="footWa" target="_blank" rel="noopener noreferrer" data-i18n="waBtn">واتساب مباشر</a>
+            </div>
+        </div>
+    </footer>
+
+    <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle" onclick="closeModal(event)">
+        <div class="modal-card">
+            <button type="button" class="close-btn" onclick="closeModal(event, true)" aria-label="إغلاق">×</button>
+            <h3 id="mTitle"></h3>
+            <p id="mDesc"></p>
+            <div class="actions">
+                <a href="#calc" onclick="closeModal(null, true)" class="btn btn-wa" data-i18n="order">افتح حاسبة المصروفات</a>
+                <button type="button" class="btn btn-soft" onclick="fillTopic()" data-i18n="fill">املأ الفورم</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const PHONE = "201064591835";
+        const EMAIL = "saifalnagar42@gmail.com";
+        const COURSES_DATA = [
+            {
+                cat: "y1",
+                arBadge: "سنة أولى • حاسبات وتكنولوجيا المعلومات",
+                enBadge: "Year 1 • Computers & IT",
+                arTitle: "أساسيات سنة أولى حاسبات والبرمجة",
+                enTitle: "Year 1 Computers & Intro Programming",
+                arList: [
+                    { ar: "مقدمة في علوم الحاسب وتكنولوجيا المعلومات", en: "Introduction to Computer Science & IT" },
+                    { ar: "أساسيات البرمجة وحل المشكلات", en: "Programming Fundamentals & Problem Solving" },
+                    { ar: "الرياضيات التمهيدية والجبر والمنطق", en: "Foundational Math, Algebra & Logic" },
+                    { ar: "اللغة الإنجليزية الأكاديمية", en: "Academic English" }
+                ]
+            },
+            {
+                cat: "y1",
+                arBadge: "سنة أولى • إدارة الأعمال",
+                enBadge: "Year 1 • Business Administration",
+                arTitle: "أساسيات سنة أولى إدارة ومحاسبة واقتصاد",
+                enTitle: "Year 1 Management, Accounting & Economics",
+                arList: [
+                    { ar: "مبادئ الإدارة والأعمال", en: "Principles of Management" },
+                    { ar: "مبادئ المحاسبة المالية (1)", en: "Financial Accounting Principles (1)" },
+                    { ar: "مبادئ الاقتصاد الجزئي والكلي", en: "Microeconomics & Macroeconomics" },
+                    { ar: "مهارات الحاسب والتواصل للأعمال", en: "Business Computing & Communication" }
+                ]
+            },
+            {
+                cat: "y2",
+                arBadge: "سنة تانية • حاسبات وتكنولوجيا المعلومات",
+                enBadge: "Year 2 • Computers & IT",
+                arTitle: "مواد سنة تانية برمجة وهياكل بيانات وقواعد بيانات",
+                enTitle: "Year 2 OOP, Data Structures, Databases & Networks",
+                arList: [
+                    { ar: "البرمجة الكائنية التوجه", en: "Object-Oriented Programming (OOP)" },
+                    { ar: "هياكل البيانات والخوارزميات", en: "Data Structures & Algorithms" },
+                    { ar: "قواعد البيانات", en: "Database Systems" },
+                    { ar: "نظم التشغيل وشبكات الحاسب", en: "Operating Systems & Computer Networks" }
+                ]
+            },
+            {
+                cat: "y2",
+                arBadge: "سنة تانية • إدارة الأعمال",
+                enBadge: "Year 2 • Business Administration",
+                arTitle: "مواد سنة تانية تسويق وتمويل ونظم معلومات إدارية",
+                enTitle: "Year 2 Marketing, Finance, Cost Accounting & MIS",
+                arList: [
+                    { ar: "المحاسبة الإدارية والتكاليف", en: "Managerial & Cost Accounting" },
+                    { ar: "مبادئ التسويق وإدارة المبيعات", en: "Principles of Marketing" },
+                    { ar: "مبادئ التمويل والاستثمار", en: "Fundamentals of Finance & Investment" },
+                    { ar: "نظم المعلومات الإدارية والإحصاء", en: "Management Information Systems (MIS) & Statistics" }
+                ]
+            },
+            {
+                cat: "y3",
+                arBadge: "سنة تالتة • حاسبات وتكنولوجيا المعلومات",
+                enBadge: "Year 3 • Computers & IT",
+                arTitle: "مواد سنة تالتة هندسة برمجيات وتطوير ويب وذكاء اصطناعي",
+                enTitle: "Year 3 Software Engineering, Web, AI & Security",
+                arList: [
+                    { ar: "هندسة البرمجيات وإدارة المشاريع", en: "Software Engineering & Project Management" },
+                    { ar: "تطوير تطبيقات الويب والموبايل", en: "Web & Mobile Application Development" },
+                    { ar: "مقدمة في الذكاء الاصطناعي وتعلم الآلة", en: "Introduction to AI & Machine Learning" },
+                    { ar: "أمن المعلومات وإدارة الشبكات", en: "Information Security & Network Administration" }
+                ]
+            },
+            {
+                cat: "y3",
+                arBadge: "سنة تالتة • إدارة الأعمال",
+                enBadge: "Year 3 • Business Administration",
+                arTitle: "مواد سنة تالتة سلاسل إمداد وتسويق رقمي وتحليل أعمال",
+                enTitle: "Year 3 Supply Chain, Digital Marketing & Business Analytics",
+                arList: [
+                    { ar: "إدارة العمليات وسلاسل الإمداد", en: "Operations & Supply Chain Management" },
+                    { ar: "التسويق الرقمي وسلوك المستهلك", en: "Digital Marketing & Consumer Behavior" },
+                    { ar: "تحليل البيانات ودعم القرار الإداري", en: "Business Analytics & Decision Support" },
+                    { ar: "إدارة الموارد البشرية والقيادة", en: "Human Resource Management & Leadership" }
+                ]
+            },
+            {
+                cat: "y4",
+                arBadge: "سنة رابعة • حاسبات وتكنولوجيا المعلومات",
+                enBadge: "Year 4 • Computers & IT",
+                arTitle: "مواد سنة رابعة سحابة وبيانات ضخمة ومشروع التخرج",
+                enTitle: "Year 4 Cloud, Big Data, Electives & Graduation Project",
+                arList: [
+                    { ar: "الحوسبة السحابية وتوزيع الأنظمة", en: "Cloud Computing & Distributed Systems" },
+                    { ar: "تحليل البيانات الضخمة والذكاء التطبيقي", en: "Big Data Analytics & Applied AI" },
+                    { ar: "مقررات تخصصية متقدمة", en: "Advanced Specialization Electives" },
+                    { ar: "مشروع التخرج والتدريب الميداني", en: "Graduation Project & Capstone Practicum" }
+                ]
+            },
+            {
+                cat: "y4",
+                arBadge: "سنة رابعة • إدارة الأعمال",
+                enBadge: "Year 4 • Business Administration",
+                arTitle: "مواد سنة رابعة إدارة استراتيجية وريادة أعمال ومشروع التخرج",
+                enTitle: "Year 4 Strategic Management, Entrepreneurship & Graduation Project",
+                arList: [
+                    { ar: "الإدارة الاستراتيجية والسياسات", en: "Strategic Management & Corporate Policy" },
+                    { ar: "ريادة الأعمال ودراسات الجدوى", en: "Entrepreneurship & Feasibility Studies" },
+                    { ar: "الحوكمة وأخلاقيات الأعمال الدولية", en: "Corporate Governance & International Business Ethics" },
+                    { ar: "مشروع التخرج والتدريب العملي", en: "Graduation Project & Business Practicum" }
+                ]
+            },
+            {
+                cat: "it",
+                arBadge: "تخصص • تكنولوجيا المعلومات",
+                enBadge: "Track • Information Technology (IT)",
+                arTitle: "مسار تكنولوجيا المعلومات والشبكات والأنظمة والويب",
+                enTitle: "IT Track: Networks, Systems, Web & IT Infrastructure",
+                arList: [
+                    { ar: "شبكات الحاسب وأمن المعلومات", en: "Computer Networks & Information Security" },
+                    { ar: "إدارة الأنظمة والخوادم", en: "Systems & Server Administration" },
+                    { ar: "تطوير تطبيقات الويب والخدمات السحابية", en: "Web Development & Cloud Services" },
+                    { ar: "إدارة مشاريع تكنولوجيا المعلومات", en: "IT Project Management" }
+                ]
+            },
+            {
+                cat: "it",
+                arBadge: "تخصص • الذكاء الاصطناعي",
+                enBadge: "Track • Artificial Intelligence (AI)",
+                arTitle: "مسار الذكاء الاصطناعي وتعلم الآلة ومعالجة البيانات",
+                enTitle: "AI Track: Machine Learning, Deep Learning & Intelligent Systems",
+                arList: [
+                    { ar: "أساسيات الذكاء الاصطناعي والبحث", en: "AI Fundamentals & Search Algorithms" },
+                    { ar: "تعلم الآلة والتعلم العميق", en: "Machine Learning & Deep Learning" },
+                    { ar: "رؤية الحاسب ومعالجة اللغات الطبيعية", en: "Computer Vision & Natural Language Processing (NLP)" },
+                    { ar: "الأنظمة الذكية وتطبيقاتها", en: "Intelligent Systems & Applications" }
+                ]
+            },
+            {
+                cat: "it",
+                arBadge: "تخصص • علوم البيانات",
+                enBadge: "Track • Data Science",
+                arTitle: "مسار علوم البيانات وتحليل البيانات الضخمة والنمذجة",
+                enTitle: "Data Science Track: Big Data, Analytics & Statistical Modeling",
+                arList: [
+                    { ar: "الإحصاء التطبيقي والنمذجة التنبؤية", en: "Applied Statistics & Predictive Modeling" },
+                    { ar: "تنقيب البيانات وإدارة قواعد البيانات", en: "Data Mining & Database Management" },
+                    { ar: "تحليل وتصور البيانات الضخمة", en: "Big Data Analytics & Visualization" },
+                    { ar: "ذكاء الأعمال ودعم القرار", en: "Business Intelligence & Decision Support" }
+                ]
+            },
+            {
+                cat: "bus",
+                arBadge: "تخصص • المحاسبة والتمويل",
+                enBadge: "Track • Accounting & Finance",
+                arTitle: "مسار المحاسبة والتمويل والاستثمار والتحليل المالي",
+                enTitle: "Business Track: Accounting, Finance & Investment",
+                arList: [
+                    { ar: "المحاسبة المالية والإدارية والتكاليف", en: "Financial, Managerial & Cost Accounting" },
+                    { ar: "الإدارة المالية والأسواق المالية", en: "Financial Management & Financial Markets" },
+                    { ar: "تقييم الاستثمارات والتحليل المالي", en: "Investment Appraisal & Financial Analysis" },
+                    { ar: "المراجعة والرقابة المالية", en: "Auditing & Financial Control" }
+                ]
+            },
+            {
+                cat: "bus",
+                arBadge: "تخصص • التسويق وسلاسل الإمداد وMIS",
+                enBadge: "Track • Marketing, Supply Chain & MIS",
+                arTitle: "مسار التسويق الرقمي وسلاسل الإمداد ونظم المعلومات الإدارية",
+                enTitle: "Business Track: Digital Marketing, Supply Chain & MIS",
+                arList: [
+                    { ar: "التسويق وإدارة العلامات التجارية", en: "Marketing & Brand Management" },
+                    { ar: "التسويق الرقمي وتحليل السوق", en: "Digital Marketing & Market Analytics" },
+                    { ar: "إدارة العمليات وسلاسل الإمداد", en: "Operations & Supply Chain Management" },
+                    { ar: "نظم المعلومات الإدارية (MIS)", en: "Management Information Systems (MIS)" }
+                ]
+            },
+            {
+                cat: "gen",
+                arBadge: "متطلبات عامة • مشتركة",
+                enBadge: "General • Shared Requirements",
+                arTitle: "الرياضيات والإحصاء واللغة والمهارات الأكاديمية",
+                enTitle: "Discrete Math, Statistics, English & Ethics",
+                arList: [
+                    { ar: "الرياضيات المتقطعة والجبر الخطي", en: "Discrete Mathematics & Linear Algebra" },
+                    { ar: "الإحصاء والاحتمالات", en: "Statistics & Probability" },
+                    { ar: "اللغة الإنجليزية والكتابة التقنية", en: "English & Technical Writing" },
+                    { ar: "مهارات التفكير النقدي وأخلاقيات المهنة", en: "Critical Thinking & Professional Ethics" }
+                ]
+            }
+        ];
+
+        const PREREQS_DATA = [
+            {
+                arTag: "برمجة وخوارزميات",
+                enTag: "Programming & Algorithms",
+                fromAr: "أساسيات البرمجة والبرمجة الكائنية",
+                fromEn: "Programming Fundamentals & OOP",
+                arrowText: "تقفل أو تفتح ←",
+                toAr: "هياكل البيانات والخوارزميات وهندسة البرمجيات",
+                toEn: "Data Structures, Algorithms & Software Engineering"
+            },
+            {
+                arTag: "البيانات والأنظمة",
+                enTag: "Data & Systems",
+                fromAr: "قواعد البيانات ونظم التشغيل",
+                fromEn: "Database Systems & Operating Systems",
+                arrowText: "تقفل أو تفتح ←",
+                toAr: "تطبيقات الويب المتقدمة والحوسبة السحابية",
+                toEn: "Advanced Web Apps & Cloud Computing"
+            },
+            {
+                arTag: "الرياضيات والذكاء الاصطناعي",
+                enTag: "Math & AI",
+                fromAr: "الرياضيات المتقطعة والجبر والإحصاء",
+                fromEn: "Discrete Math, Linear Algebra & Statistics",
+                arrowText: "تقفل أو تفتح ←",
+                toAr: "الذكاء الاصطناعي وتعلم الآلة وتحليل البيانات",
+                toEn: "Artificial Intelligence, Machine Learning & Data Analytics"
+            },
+            {
+                arTag: "المحاسبة والتمويل",
+                enTag: "Accounting & Finance",
+                fromAr: "مبادئ المحاسبة المالية والاقتصاد",
+                fromEn: "Financial Accounting & Economics",
+                arrowText: "تقفل أو تفتح ←",
+                toAr: "المحاسبة الإدارية والإدارة المالية والاستثمار",
+                toEn: "Managerial Accounting, Finance & Investment"
+            }
+        ];
+
+        const BRANCHES = [
+            { arName: "المقر الرئيسي — الدقي / الجيزة", enName: "HQ — Dokki / Giza", arLoc: "33 شارع المساحة، الدقي، الجيزة", enLoc: "33 El-Messaha St, Dokki, Giza" },
+            { arName: "فرع القاهرة — جامعة عين شمس", enName: "Cairo — Ain Shams Univ.", arLoc: "مقر مركز التعلم الإلكتروني بجامعة عين شمس", enLoc: "E-Learning Center, Ain Shams University" },
+            { arName: "فرع الإسكندرية", enName: "Alexandria Branch", arLoc: "مجمع الشاطبي / جامعة الإسكندرية", enLoc: "Shatby / Alexandria University" },
+            { arName: "فرع أسيوط", enName: "Assiut Branch", arLoc: "داخل حرم جامعة أسيوط", enLoc: "Assiut University Campus" },
+            { arName: "فرع طنطا", enName: "Tanta Branch", arLoc: "مجمع الكليات بسبرباي، جامعة طنطا", enLoc: "Sebrbay Campus, Tanta University" },
+            { arName: "فرع المنوفية", enName: "Menoufia Branch", arLoc: "شبين الكوم، جامعة المنوفية", enLoc: "Shebin El-Kom, Menoufia University" },
+            { arName: "فرع السادات", enName: "Sadat City Branch", arLoc: "مدينة السادات، جامعة السادات", enLoc: "Sadat City University" },
+            { arName: "فرع بني سويف", enName: "Beni Suef Branch", arLoc: "جامعة بني سويف", enLoc: "Beni Suef University" },
+            { arName: "فرع الفيوم", enName: "Fayoum Branch", arLoc: "جامعة الفيوم", enLoc: "Fayoum University" },
+            { arName: "فرع المنيا", enName: "Minya Branch", arLoc: "جامعة المنيا", enLoc: "Minya University" },
+            { arName: "فرع سوهاج", enName: "Sohag Branch", arLoc: "جامعة سوهاج", enLoc: "Sohag University" },
+            { arName: "فرع قنا", enName: "Qena Branch", arLoc: "جامعة جنوب الوادي بقنا", enLoc: "South Valley University, Qena" },
+            { arName: "فرع الغردقة", enName: "Hurghada Branch", arLoc: "فرع جامعة جنوب الوادي بالبحر الأحمر", enLoc: "South Valley Univ., Hurghada" },
+            { arName: "فرع أسوان", enName: "Aswan Branch", arLoc: "جامعة أسوان", enLoc: "Aswan University" },
+            { arName: "فرع الإسماعيلية", enName: "Ismailia Branch", arLoc: "جامعة قناة السويس بالإسماعيلية", enLoc: "Suez Canal University, Ismailia" }
+        ];
+
+        const DEFAULT_NOTES = [
+            { id: "n1", cat: "code", arTitle: "تخصصات الحاسبات وتكنولوجيا المعلومات", enTitle: "Computers & IT Tracks", arBody: "• تضم برامج تكنولوجيا المعلومات (IT)، الذكاء الاصطناعي، وعلوم البيانات.\n• متاحة للشعب العلمية والشهادات المعادلة بحد أدنى معلن 61%.\n• تجمع بين الأسس الأكاديمية والتطبيق العملي في المشاريع.", enBody: "• Covers Information Technology (IT), AI, and Data Science.\n• Open to science tracks and equivalents at 61% announced minimum.\n• Combines academic foundations with practical projects." },
+            { id: "n2", cat: "math", arTitle: "برامج كلية إدارة الأعمال", enTitle: "Business Administration Tracks", arBody: "• تشمل المحاسبة، التسويق، التمويل والاستثمار، سلاسل الإمداد، ونظم المعلومات الإدارية.\n• متاحة للطلاب والشهادات المعادلة بحد أدنى معلن 53%.\n• تمنح شهادة بكالوريوس معتمدة من المجلس الأعلى للجامعات.", enBody: "• Includes Accounting, Marketing, Finance, Supply Chain, and MIS.\n• Open to eligible tracks and equivalents at 53% announced minimum.\n• Grants a degree accredited by the Supreme Council of Universities." },
+            { id: "n3", cat: "ai", arTitle: "نظام التعلم المدمج والمنح الدراسية", enTitle: "Blended Model & Scholarships", arBody: "• يجمع بين المنصة الإلكترونية والتعلم الذاتي مع المتابعة والأنشطة في فروع المحافظات.\n• التقديم إلكتروني عبر بوابة الجامعة مع تفعيل البريد ومتابعة الخط الساخن 16541.\n• تتوفر منح وتخفيضات وفق الضوابط المعلنة لكل عام جامعي.", enBody: "• Combines online platforms and self-study with regional branch support.\n• Apply online via the admission portal and verify email; hotline 16541.\n• Scholarships and discounts follow announced academic rules." }
+        ];
+
+        const NOTES_STORAGE_KEY = "sf_eelu_notes_v1";
+
+        const I18N = {
+            ar: {
+                pageTitle: "SF — دليل فهم كليات ونظام EELU",
+                lang: "English", darkTitle: "الوضع الليلي", lightTitle: "الوضع النهاري",
+                liftHeaderBtn: "↑ رفع الشريط", showHeaderBtn: "↓ إظهار الشريط",
+                badge: "دليل EELU • الكليات • نظام الدراسة",
+                helloPrefix: "أهلًا، أنا", helloName: "سيف",
+                helloSub: "أساعدك تفهم كليات ونظام الجامعة المصرية للتعلم الإلكتروني الأهلية EELU",
+                navEelu: "عن EELU", navConcepts: "مفاهيم الكلية", navGuide: "تالتة ثانوي", navCourses: "المواد", navPrereqs: "خريطة المواد", navCalc: "المصروفات", navAsk: "المجيب", navBranches: "الفروع", navNotes: "الملخصات", navContact: "تواصل",
+                bio: "أساعدك تفهم عن كلية وبرامج EELU ونظام التعلم المدمج والساعات المعتمدة والامتحانات والمواد المتطلبة والتنسيق والتقديم بشكل واضح.",
+                botIdle: "اضغط عليّ! أنا مساعد SF",
+                botSay: ["أهلاً بك في دليل EELU!", "أضفنا التخصصات الدقيقة وسنوات الدراسة بالعربي والإنجليزي.", "تعرف على الساعات المعتمدة والمواد التي تقفل مواد أخرى."],
+                status: "الحالة: متاح للإجابة عن استفسارات EELU", waBtn: "واتساب مباشر", msgBtn: "اكتب رسالة",
+                eeluTitle: "ملخص عن جامعة EELU",
+                eeluHint: "طلاب EELU والفروع — جامعة معتمدة بنظام التعلم المدمج",
+                eeluLead: "الجامعة المصرية للتعلم الإلكتروني الأهلية (EELU) جامعة أهلية معتمدة من وزارة التعليم العالي والبحث العلمي والمجلس الأعلى للجامعات، وتخدم طلاب EELU عبر فروع ومراكز دراسية في المحافظات بنظام التعلم المدمج بين المنصات الرقمية والتعلم الذاتي.",
+                eeluPoint1Title: "طلاب EELU والفروع",
+                eeluPoint1Desc: "يتابع طلاب EELU محاضراتهم ومحتواهم الإلكتروني مع الاستفادة من الفروع والمراكز الدراسية في المحافظات وشهاداتها المعتمدة رسميًا.",
+                eeluPoint2Title: "الحاسبات وتكنولوجيا المعلومات",
+                eeluPoint2Desc: "تمنح درجة البكالوريوس المعتمدة في تخصصات تكنولوجيا المعلومات والذكاء الاصطناعي وعلوم البيانات مع التركيز على التطبيق العملي.",
+                eeluPoint3Title: "إدارة الأعمال والدراسات التربوية",
+                eeluPoint3Desc: "تضم برامج معتمدة في إدارة الأعمال والتخصصات التجارية، إضافة إلى برامج الدراسات التربوية وتكنولوجيا التعليم.",
+                conceptsTitle: "مفاهيم جامعية قد تبدو غامضة في البداية",
+                conceptsHint: "شرح مبسّط للساعات المعتمدة، نظام الامتحانات، والمواد المتطلبة التي تفتح أو تقفل مواد أخرى",
+                cp1Tag: "01 • الساعات المعتمدة",
+                cp1Title: "ما معنى الساعات المعتمدة (Credit Hours)؟",
+                cp1Desc: "بدلًا من نظام السنوات المغلق، تقيس الساعات المعتمدة وزن كل مادة وساعات تدريسها وتحدد تقدمك نحو التخرج:",
+                cp1B1: "غالبًا تكون المادة 3 ساعات معتمدة، ويتحدد عدد الساعات التي تسجلها في الفصل الدراسي حسب لائحة الكلية ومعدلك التراكمي (GPA).",
+                cp1B2: "المواد ذات الساعات الأعلى يكون تأثيرها أكبر على حساب المعدل الفصلي والتراكمي.",
+                cp1B3: "التخرج يتطلب إتمام إجمالي الساعات المعتمدة المطلوبة للبرنامج بنجاح.",
+                cp2Tag: "02 • نظام الامتحانات",
+                cp2Title: "كيف تُحسب الدرجات والامتحانات؟",
+                cp2Desc: "التقييم في الجامعة يعتمد على متابعة مستمرة وليس امتحانًا واحدًا فقط في نهاية الترم:",
+                cp2B1: "تتوزع الدرجة غالبًا بين أعمال السنة (كويزات، واجبات، مشاريع أو تطبيقات عملية) والاختبارات المقررة في اللوائح.",
+                cp2B2: "الالتزام بتسليم المهام والأنشطة على المنصة يحمي درجتك ويقلل الضغط وقت الامتحانات النهائية.",
+                cp2B3: "في حال الرسوب في مادة، تُعاد دراستها أو اختبارها وفق لائحة الكلية ويظهر أثرها في المعدل حسب القواعد المعتمدة.",
+                cp3Tag: "03 • المواد التي تقفل مواد",
+                cp3Title: "ما هي المتطلبات السابقة (Prerequisites)؟",
+                cp3Desc: "بعض المواد تكون «متطلبًا سابقًا» لمواد أخرى؛ أي أن عدم اجتيازها يقفل عليك فتح المواد التي تعتمد عليها:",
+                cp3B1: "مثال شائع: مادة برمجة أساسية قد تقفل مادة «هياكل البيانات»، أو مادة «قواعد البيانات» تقفل مادة متقدمة تعتمد عليها.",
+                cp3B2: "تأجيل أو الرسوب في مادة متطلبة قد يؤخر فتح مادة لاحقة في الترم التالي إذا كانت شرطًا للتسجيل.",
+                cp3B3: "مراجعة شجرة المواد (Course Prerequisites) قبل تسجيل كل ترم تجنّبك أي تعطل في الخطة الدراسية.",
+                guideTitle: "إرشادات لطلاب تالتة ثانوي عن EELU",
+                guideHint: "كل ما يهم طالب الثانوية العامة معرفته قبل التقديم: الحدود الدنيا، المصروفات، الكليات، خطوات التقديم، والمنح",
+                g1Tag: "التنسيق والمصروفات",
+                g1Title: "مؤشرات القبول والمصروفات (2026/2027)",
+                g1Desc: "الحدود الدنيا المعلنة لعام 2026/2027 ومصروفات البرامج السنوية التقريبية:",
+                g1B1: "حاسبات وتكنولوجيا المعلومات: حد أدنى 61% — نحو 61,868 جنيه (علمي رياضة) و64,268 جنيه (علمي علوم).",
+                g1B2: "إدارة الأعمال: حد أدنى 53% — نحو 48,612 جنيه سنويًا.",
+                g1B3: "الشهادة معتمدة من المجلس الأعلى للجامعات وتعادل نظيراتها الحكومية.",
+                g2Tag: "الكليات ونظام الدراسة",
+                g2Title: "كيف تدرس وكيف تختار كليتك؟",
+                g2Desc: "الدراسة تجمع بين المنصة الإلكترونية والمحتوى التفاعلي والمتابعة والأنشطة في الفروع:",
+                g2B1: "الحاسبات وتكنولوجيا المعلومات (تكنولوجيا المعلومات، الذكاء الاصطناعي، علوم البيانات) للشعب العلمية والشهادات المعادلة.",
+                g2B2: "إدارة الأعمال (محاسبة، تسويق، تمويل واستثمار، سلاسل إمداد، نظم معلومات إدارية) لعلمي وأدبي والشهادات المعادلة.",
+                g2B3: "مرونة التعلم المدمج تمنحك وقتًا للتدريب العملي والبرمجة بجانب المقررات.",
+                g3Tag: "التقديم والمنح",
+                g3Title: "خطوات التقديم والمنح الدراسية",
+                g3Desc: "استعد مبكرًا وجهّز أوراقك واطّلع على برامج الدعم والمنح المتاحة:",
+                g3B1: "إنشاء حساب على بوابة التقديم الإلكترونية للجامعة وتفعيل الرابط المرسل على البريد الإلكتروني.",
+                g3B2: "منح وتخفيضات وفق الضوابط المعلنة (مثل أوائل الثانوية وSTEM، التفوق الأكاديمي أو الرياضي، والحالات الخاصة).",
+                g3B3: "يمكنك الاستفسار عن الخط الساخن 16541 أو إرسال سؤالك هنا مباشرة.",
+                gAskBtn: "اسأل عن التقديم والمنح",
+                gMsgPrefix: "استفسار لطالب ثانوية عامة بخصوص التقديم والمنح في EELU: ",
+                gNote: "تنويه: الأرقام المذكورة وفق المعلن لعام 2026/2027 وقد تختلف تفاصيل المصروفات أو الضوابط من عام لآخر؛ راجع الإعلانات الرسمية للجامعة قبل السداد.",
+                coursesTitle: "المواد والمقررات الدراسية في EELU",
+                coursesHint: "كل مادة معروضة بالعربي والإنجليزي معاً — من سنة أولى إلى سنة رابعة والتخصصات الدقيقة والمتطلبات العامة",
+                cAll: "الكل", cY1: "سنة أولى", cY2: "سنة تانية", cY3: "سنة تالتة", cY4: "سنة رابعة", cIt: "حاسبات وتكنولوجيا المعلومات", cBus: "إدارة الأعمال", cGen: "متطلبات عامة",
+                askCourseBtn: "اسأل عن هذه المواد",
+                courseMsgPrefix: "استفسار بخصوص المواد الدراسية في: ",
+                prereqsTitle: "خريطة المواد التي تقفل أو تفتح مواد أخرى",
+                prereqsHint: "أمثلة عملية بالاسم العربي والإنجليزي لمسارات الاعتماد بين المواد في الكلية",
+                calcTitle: "حاسبة التنسيق والمصروفات التقديرية",
+                calcHint: "اختر الشعبة واكتب نسبتك المئوية لتعرف موقفك من الحدود الدنيا والمصروفات السنوية التقريبية (2026/2027)",
+                calcTrackLbl: "الشعبة الدراسية",
+                trMath: "علمي رياضة", trBio: "علمي علوم", trArts: "أدبي",
+                calcPctLbl: "النسبة المئوية (%)",
+                calcSendBtn: "أرسل النتيجة لسيف",
+                calcEligible: "متاح حسب الحد الأدنى",
+                calcBelow: "أقل من الحد الأدنى المعلن",
+                calcMinLbl: "الحد الأدنى:",
+                calcFeeLbl: "المصروفات السنوية التقريبية:",
+                qaTitle: "اسأل المجيب التلقائي في أي حاجة",
+                qaHint: "اكتب سؤالك عن الكلية أو المواد أو الساعات المعتمدة أو الامتحانات أو المواد المتطلبة والتنسيق والمصروفات وهيرد عليك فورًا",
+                qaChip1: "ما هي الساعات المعتمدة وكيف تعمل؟",
+                qaChip2: "ما هي المواد التي تقفل مواد أخرى؟",
+                qaChip3: "كيف نظام الامتحانات والدرجات؟",
+                qaChip4: "ما هو تنسيق ومصاريف الكلية؟",
+                qaInputPh: "اكتب سؤالك هنا... مثال: يعني إيه ساعات معتمدة؟ أو إيه المواد اللي بتقفل مواد؟ أو إزاي الامتحانات؟",
+                qaBtn: "رد الآن",
+                qaSendContact: "أرسل السؤال لسيف",
+                qaWelcome: "أهلًا بك! أنا المجيب التلقائي لفهم EELU. اسأل عن الساعات المعتمدة، المواد التي تقفل مواد أخرى، الامتحانات، التنسيق، المصروفات، أو الفروع وسأرد عليك فورًا.",
+                qaPromptEmpty: "اكتب سؤالك أولًا عشان أقدر أرد عليك.",
+                branchesTitle: "فروع ومراكز EELU بالمحافظات",
+                branchesHint: "ابحث عن فرعك أو اختره لإرسال رسالة سريعة بخصوصه",
+                branchSearchPh: "ابحث باسم المحافظة أو الفرع...",
+                askBranch: "اسأل عن هذا الفرع",
+                branchMsgPrefix: "استفسار بخصوص فرع: ",
+                notesTitle: "ملاحظات وملخصات عن EELU",
+                notesHint: "الصق أي نص أو إعلان أو شرح وسيقوم الملخّص التلقائي باستخراج أهم النقاط لوحده، مع إمكانية النسخ أو الحذف",
+                copyNoteBtn: "نسخ", deleteNoteBtn: "حذف",
+                noteCopied: "تم نسخ الملخص!", noteDeleted: "تم حذف الملخص.",
+                addNoteTitle: "ملخّص تلقائي لأي نص",
+                autoSumBtn: "لخّص تلقائيًا",
+                noteSubLbl: "العنوان / الموضوع", noteBodyLbl: "النص أو الملخص",
+                saveNoteBtn: "حفظ الملخص", noteSaved: "تم حفظ الملخص!",
+                noteNeedText: "اكتب أو الصق نصًا أولًا ليتم تلخيصه.",
+                noteSummarized: "تم تلخيص النص تلقائيًا — راجعه ثم احفظه.",
+                autoTopicLabel: "ملخص تلقائي",
+                roadmapTitle: "خطوات فهم الكلية والالتحاق بها",
+                roadmapHint: "رحلة واضحة من التعرف على التخصصات حتى التقديم وبداية الدراسة",
+                step1Tag: "الخطوة 01", step1Title: "اختيار الكلية والتخصص",
+                step1Desc: "المقارنة بين الحاسبات وتكنولوجيا المعلومات وإدارة الأعمال حسب شعبتك وميولك.",
+                step2Tag: "الخطوة 02", step2Title: "مراجعة التنسيق والمصروفات",
+                step2Desc: "التحقق من الحد الأدنى المعلن والمصروفات التقريبية والمنح المتاحة واختيار الفرع المناسب.",
+                step3Tag: "الخطوة 03", step3Title: "التقديم وبداية التعلم المدمج",
+                step3Desc: "إتمام التسجيل الإلكتروني والتأقلم مع المنصة الرقمية ومتابعة الفروع في محافظتك.",
+                faqTitle: "الأسئلة الشائعة عن EELU",
+                faqHint: "إجابات مختصرة عن طلاب EELU والفروع والاعتماد ونظام الدراسة",
+                faq1Q: "هل جامعة EELU وشهاداتها معتمدة؟",
+                faq1A: "نعم، الجامعة المصرية للتعلم الإلكتروني الأهلية وبرامج البكالوريوس فيها معتمدة من وزارة التعليم العالي والبحث العلمي والمجلس الأعلى للجامعات.",
+                faq2Q: "كيف يدرس طلاب EELU وما دور الفروع؟",
+                faq2A: "يدرس طلاب EELU بنظام التعلم المدمج الذي يجمع بين المحاضرات والمنصات الإلكترونية والتعلم الذاتي مع المتابعة والأنشطة في الفروع والمراكز الدراسية بالمحافظات.",
+                faq3Q: "ما أبرز التخصصات المتاحة في الحاسبات وتكنولوجيا المعلومات؟",
+                faq3A: "تضم مسارات تكنولوجيا المعلومات (IT) والذكاء الاصطناعي وعلوم البيانات، مع التركيز على الجمع بين الأساس الأكاديمي والتطبيق العملي.",
+                faq4Q: "كيف يناسب هذا النظام الطلاب المهتمين بالبرمجة والتطبيق العملي؟",
+                faq4A: "مرونة تنظيم الوقت في التعلم المدمج تساعد الطالب على تخصيص وقت مستمر لكتابة الكود، حل المسائل، وبناء مشاريع عملية بجانب المقررات.",
+                workTitle: "كيف أساعدك تفهم عن EELU", workHint: "اضغط على أي بطاقة لعرض التفاصيل والانتقال للاستفسار أو الحاسبة", more: "اعرف أكثر ←",
+                s1t: "فهم كليات وتخصصات EELU", s1d: "أوضح لك الفرق بين برامج الحاسبات وتكنولوجيا المعلومات وإدارة الأعمال والدراسات التربوية.",
+                s2t: "شرح نظام الدراسة المدمج والفروع", s2d: "أشرح لك كيف تعمل المنصة الإلكترونية والمراكز والفروع في المحافظات والامتحانات والساعات المعتمدة.",
+                s3t: "دليل التنسيق والمصروفات والتقديم", s3d: "أساعدك تفهم الحدود الدنيا والمصروفات السنوية التقريبية والمنح وخطوات التقديم لطلاب تالتة ثانوي.",
+                fAll: "الكل", fCode: "تكنولوجيا المعلومات", fMath: "إدارة الأعمال", fAi: "النظام والمنح",
+                cTitle: "تواصل معي", cHint: "محتاج توضيح أكتر عن كلية EELU، التخصصات، المصروفات، الفروع، أو خطوات التقديم؟ ابعتلي سؤالك وهرد عليك في أقرب وقت.",
+                waLbl: "واتساب:", emLbl: "البريد الإلكتروني:", nameLbl: "الاسم", topicLbl: "الموضوع", msgLbl: "الرسالة",
+                sendWa: "إرسال عبر واتساب", sendMail: "إرسال عبر Gmail", copy: "نسخ الرسالة",
+                openedWa: "تم فتح واتساب برسالتك جاهزة للإرسال!",
+                autoReplyTitle: "رد تلقائي قريب:",
+                autoReplyByTopic: {
+                    code: "أهلًا بك {name}! وصلني استفسارك عن كليات وتخصصات EELU وهرد عليك بتفاصيل واضحة قريبًا.",
+                    ai: "أهلًا {name}! بخصوص نظام الدراسة المدمج والفروع في EELU، هراجع سؤالك وأرد عليك قريبًا.",
+                    study: "أهلًا يا {name}! منور، هرد عليك بخصوص التنسيق والمصروفات والتقديم في EELU في أقرب وقت."
+                },
+                defaultName: "يا صديقي",
+                autoReplyPrefix: "رد تلقائي",
+                copyRight: "© 2026 SF. جميع الحقوق محفوظة.", order: "افتح حاسبة المصروفات", fill: "املأ الفورم",
+                hi: "مرحباً SF، شفت دليل EELU وحابب أستفسر عن الكلية.", copied: "تم نسخ الرسالة والرد التلقائي!"
+            },
+            en: {
+                pageTitle: "SF — EELU Faculties & System Guide",
+                lang: "عربي", darkTitle: "Dark Mode", lightTitle: "Light Mode",
+                liftHeaderBtn: "↑ Lift Bar", showHeaderBtn: "↓ Show Bar",
+                badge: "EELU Guide • Faculties • Study Model",
+                helloPrefix: "Hi, I'm", helloName: "Saif",
+                helloSub: "Helping you understand faculties, tracks, and the blended model at EELU",
+                navEelu: "About EELU", navConcepts: "Key Concepts", navGuide: "Seniors", navCourses: "Courses", navPrereqs: "Prereq Map", navCalc: "Fees", navAsk: "Auto-Bot", navBranches: "Branches", navNotes: "Notes", navContact: "Contact",
+                bio: "I help you understand EELU faculties, blended learning, credit hours, exams, prerequisite courses, admission cutoffs, and tuition clearly.",
+                botIdle: "Click me! I'm SF's bot",
+                botSay: ["Welcome to the EELU guide!", "Detailed tracks and study years are shown in Arabic & English.", "Learn how credit hours and prerequisites work."],
+                status: "Status: Ready to answer EELU questions", waBtn: "Direct WhatsApp", msgBtn: "Write a message",
+                eeluTitle: "EELU Overview",
+                eeluHint: "EELU students & branches — accredited blended learning university",
+                eeluLead: "The Egyptian E-Learning University (EELU) is accredited by Egypt's Ministry of Higher Education and Scientific Research and the Supreme Council of Universities, supporting EELU students across regional branches and study centers via blended and self-paced learning.",
+                eeluPoint1Title: "EELU Students & Branches",
+                eeluPoint1Desc: "EELU students follow online courses and lectures alongside regional branches and study centers with officially accredited degrees.",
+                eeluPoint2Title: "Computers & Information Technology",
+                eeluPoint2Desc: "Awards accredited bachelor's degrees in Information Technology, Artificial Intelligence, and Data Science with practical emphasis.",
+                eeluPoint3Title: "Business & Educational Studies",
+                eeluPoint3Desc: "Offers accredited Business Administration tracks alongside postgraduate programs in education and e-learning technology.",
+                conceptsTitle: "University Concepts That Can Feel Unclear at First",
+                conceptsHint: "Clear breakdown of credit hours, exam structure, and prerequisite courses that unlock or block later ones",
+                cp1Tag: "01 • Credit Hours",
+                cp1Title: "How Do Credit Hours Work?",
+                cp1Desc: "Instead of fixed rigid year-blocks, credit hours measure course weight and guide your progress toward graduation:",
+                cp1B1: "Many courses carry 3 credit hours, and your semester load depends on faculty rules and your cumulative GPA.",
+                cp1B2: "Higher-credit courses carry greater weight in your semester and cumulative GPA calculations.",
+                cp1B3: "Graduation requires completing all required program credit hours successfully.",
+                cp2Tag: "02 • Exam & Grading System",
+                cp2Title: "How Are Exams & Grades Calculated?",
+                cp2Desc: "Evaluation relies on ongoing work rather than a single end-of-term test:",
+                cp2B1: "Grades typically combine continuous coursework (quizzes, assignments, labs/projects) and scheduled exams under faculty bylaws.",
+                cp2B2: "Staying on top of portal tasks and projects protects your score and lowers final exam pressure.",
+                cp2B3: "If a course is failed, retaking/re-examining follows faculty regulations and reflects in your GPA rules.",
+                cp3Tag: "03 • Prerequisites",
+                cp3Title: "Which Courses Lock or Unlock Other Courses?",
+                cp3Desc: "Some courses act as prerequisites for others—missing them blocks registering for dependent courses:",
+                cp3B1: "Common example: an introductory programming course may lock Data Structures, or Databases may lock an advanced course.",
+                cp3B2: "Delaying or failing a prerequisite course can postpone a follow-up course in the next semester.",
+                cp3B3: "Checking the prerequisite map before each registration prevents study-plan bottlenecks.",
+                guideTitle: "EELU Guide for High School Seniors",
+                guideHint: "Key facts for Thanawiya Amma students: admission minimums, tuition, faculties, steps, and scholarships",
+                g1Tag: "Admission & Tuition",
+                g1Title: "Admission Benchmarks & Fees (2026/2027)",
+                g1Desc: "Announced minimums for 2026/2027 and approximate annual tuition:",
+                g1B1: "Computers & IT: 61% minimum — around 61,868 EGP (Math) and 64,268 EGP (Science).",
+                g1B2: "Business Administration: 53% minimum — around 48,612 EGP/year.",
+                g1B3: "Accredited by Egypt's Supreme Council of Universities equivalent to public peers.",
+                g2Tag: "Faculties & Study Model",
+                g2Title: "How You Study & Pick a Track",
+                g2Desc: "Blended learning pairs online portals and interactive materials with regional branch support:",
+                g2B1: "Computers & IT (IT, AI, Data Science) for science tracks and equivalent certificates.",
+                g2B2: "Business Administration (Accounting, Marketing, Finance, Supply Chain, MIS) for science, arts, and equivalents.",
+                g2B3: "Flexible scheduling leaves room for hands-on coding and practice alongside courses.",
+                g3Tag: "Applying & Scholarships",
+                g3Title: "Application Steps & Scholarships",
+                g3Desc: "Prepare early, check requirements, and review support and scholarship programs:",
+                g3B1: "Create an account on the university admission portal and activate via email.",
+                g3B2: "Scholarships and discounts under announced rules (top rankers & STEM, merit, sports, special cases).",
+                g3B3: "Ask via hotline 16541 or send your question right here.",
+                gAskBtn: "Ask About Admission & Grants",
+                gMsgPrefix: "High school admission & scholarship question for EELU: ",
+                gNote: "Note: Figures reflect 2026/2027 announcements and may vary by academic year; verify official university notices before payment.",
+                coursesTitle: "EELU Courses & Curriculum",
+                coursesHint: "Each course shows both Arabic and English titles — from Year 1 to Year 4, specialized tracks, and general requirements",
+                cAll: "All", cY1: "Year 1", cY2: "Year 2", cY3: "Year 3", cY4: "Year 4", cIt: "Computers & IT", cBus: "Business Admin", cGen: "General Req.",
+                askCourseBtn: "Ask about these courses",
+                courseMsgPrefix: "Question about courses in: ",
+                prereqsTitle: "Prerequisite Map: Courses That Lock or Unlock Others",
+                prereqsHint: "Practical Arabic & English examples of course dependency chains",
+                calcTitle: "Admission & Tuition Estimator",
+                calcHint: "Pick your track and enter your percentage to check cutoffs and approximate annual fees (2026/2027)",
+                calcTrackLbl: "High School Track",
+                trMath: "Math Track", trBio: "Science Track", trArts: "Arts Track",
+                calcPctLbl: "Percentage (%)",
+                calcSendBtn: "Send Estimate to Saif",
+                calcEligible: "Meets Minimum",
+                calcBelow: "Below Announced Min",
+                calcMinLbl: "Minimum:",
+                calcFeeLbl: "Approx. Annual Tuition:",
+                qaTitle: "Instant Auto-Responder for Any Question",
+                qaHint: "Ask about credit hours, prerequisites, exams, courses, cutoffs, tuition, or branches for an instant answer",
+                qaChip1: "How do credit hours work?",
+                qaChip2: "Which courses lock other courses?",
+                qaChip3: "How do exams & grades work?",
+                qaChip4: "What are cutoffs and tuition?",
+                qaInputPh: "Type any question... e.g., credit hours? prerequisites? exams? tuition?",
+                qaBtn: "Answer Now",
+                qaSendContact: "Send Question to Saif",
+                qaWelcome: "Hi! I'm SF's instant auto-responder for EELU. Ask about credit hours, prerequisites, exams, courses, cutoffs, tuition, or branches.",
+                qaPromptEmpty: "Type a question first so I can answer it.",
+                branchesTitle: "EELU Branches & Centers",
+                branchesHint: "Search by governorate or select a branch to message about it",
+                branchSearchPh: "Search governorate or branch...",
+                askBranch: "Ask about branch",
+                branchMsgPrefix: "Question about branch: ",
+                notesTitle: "EELU Notes & Summaries",
+                notesHint: "Paste any text or notice and the auto-summarizer will extract key points on its own, with copy and delete controls",
+                copyNoteBtn: "Copy", deleteNoteBtn: "Delete",
+                noteCopied: "Summary copied!", noteDeleted: "Summary deleted.",
+                addNoteTitle: "Auto-Summarize Any Text",
+                autoSumBtn: "Summarize Now",
+                noteSubLbl: "Title / Topic", noteBodyLbl: "Text or Summary",
+                saveNoteBtn: "Save Summary", noteSaved: "Summary saved!",
+                noteNeedText: "Paste or write some text first to summarize.",
+                noteSummarized: "Text summarized automatically—review and save it.",
+                autoTopicLabel: "Auto Summary",
+                roadmapTitle: "Steps to Understand & Join EELU",
+                roadmapHint: "A clear path from exploring faculties to applying and starting classes",
+                step1Tag: "STEP 01", step1Title: "Pick Faculty & Track",
+                step1Desc: "Compare Computers & IT and Business Administration based on your track and interests.",
+                step2Tag: "STEP 02", step2Title: "Check Cutoffs & Tuition",
+                step2Desc: "Review announced minimums, approximate tuition, scholarships, and your nearest branch.",
+                step3Tag: "STEP 03", step3Title: "Apply & Start Blended Study",
+                step3Desc: "Complete online registration and adapt to the digital portal and regional branch support.",
+                faqTitle: "EELU FAQ",
+                faqHint: "Quick answers about EELU students, branches, accreditation, and study system",
+                faq1Q: "Are EELU and its degrees accredited?",
+                faq1A: "Yes, the Egyptian E-Learning University and its bachelor's programs are accredited by the Ministry of Higher Education and Scientific Research and the Supreme Council of Universities.",
+                faq2Q: "How do EELU students study and what is the role of branches?",
+                faq2A: "EELU students follow a blended learning model combining online platforms and self-paced study with regional branches and study centers across governorates.",
+                faq3Q: "What are the main tracks in Computers & Information Technology?",
+                faq3A: "It includes Information Technology (IT), Artificial Intelligence, and Data Science, blending academic theory with practical work.",
+                faq4Q: "How does this model fit students focused on coding and hands-on practice?",
+                faq4A: "Flexible scheduling makes it easier to dedicate consistent time to writing code, solving problems, and building projects alongside coursework.",
+                workTitle: "How I Help You Understand EELU", workHint: "Click any card for details or jump to the calculator or contact form", more: "Learn more →",
+                s1t: "Understand EELU Faculties & Tracks", s1d: "Clarify differences across Computers & IT, Business Administration, and Educational Studies.",
+                s2t: "Explain Blended Model & Branches", s2d: "Break down how the online portal, regional branches, credit hours, and exams work.",
+                s3t: "Admission, Cutoffs & Tuition Guide", s3d: "Help you navigate admission minimums, approximate annual fees, grants, and application steps.",
+                fAll: "All", fCode: "IT & Tracks", fMath: "Business", fAi: "System & Grants",
+                cTitle: "Contact Me", cHint: "Need more clarity on EELU faculties, tracks, tuition, branches, or admissions? Send your question.",
+                waLbl: "WhatsApp:", emLbl: "Email:", nameLbl: "Name", topicLbl: "Topic", msgLbl: "Message",
+                sendWa: "Send via WhatsApp", sendMail: "Send via Gmail", copy: "Copy Message",
+                openedWa: "WhatsApp opened with your message ready to send!",
+                autoReplyTitle: "Quick Personal Reply:",
+                autoReplyByTopic: {
+                    code: "Hey {name}! Got your question about EELU faculties and tracks—I'll reply soon with clear details.",
+                    ai: "Hey {name}! Regarding EELU's blended model and branches, I'll review your question and get back soon.",
+                    study: "Hey {name}! Good to hear from you—I'll reply soon about EELU cutoffs, tuition, and admissions."
+                },
+                defaultName: "friend",
+                autoReplyPrefix: "Quick Reply",
+                copyRight: "© 2026 SF. All rights reserved.", order: "Open Tuition Calculator", fill: "Fill the Form",
+                hi: "Hi SF, I checked the EELU guide and have a question.", copied: "Message and quick reply copied!"
+            }
+        };
+
+        let lang = "ar", theme = "light", activeSrv = "code", botIdx = 0, lastFocus = null, autoReplyVisible = false, noteCat = "all", courseCat = "all";
+        let notes = loadNotes();
+
+        function escapeHtml(str) {
+            return String(str).replace(/[&<>"']/g, ch => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            }[ch]));
+        }
+
+        function setHeaderLifted(lifted) {
+            document.body.classList.toggle("header-lifted", Boolean(lifted));
+        }
+
+        function toggleHeaderLift() {
+            setHeaderLifted(!document.body.classList.contains("header-lifted"));
+        }
+
+        const waLink = t => `https://api.whatsapp.com/send?phone=${PHONE}&text=${encodeURIComponent(t)}`;
+        const mailLink = (su, body) => `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(EMAIL)}&su=${encodeURIComponent(su)}&body=${encodeURIComponent(body)}`;
+
+        function sendDirectWa(e) {
+            e.preventDefault();
+            const d = I18N[lang];
+            const fullText = buildMsg();
+            showAutoReply();
+            document.getElementById("fb").textContent = d.openedWa;
+            window.open(waLink(fullText), "_blank", "noopener,noreferrer");
+        }
+
+        function setCourseCat(cat, btn) {
+            courseCat = cat;
+            btn.parentElement.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            renderCourses();
+        }
+
+        function askCourse(courseGroupTitle) {
+            const d = I18N[lang];
+            document.getElementById("topic").value = "code";
+            const msgEl = document.getElementById("msg");
+            msgEl.value = `${d.courseMsgPrefix}${courseGroupTitle}`;
+            refreshAutoReply();
+            document.getElementById("contact").scrollIntoView({ behavior: "smooth" });
+            msgEl.focus();
+        }
+
+        function renderCourses() {
+            const d = I18N[lang];
+            const grid = document.getElementById("coursesGrid");
+            const filtered = COURSES_DATA.filter(c => courseCat === "all" || c.cat === courseCat);
+            grid.innerHTML = "";
+            filtered.forEach(c => {
+                const badge = lang === "ar" ? c.arBadge : c.enBadge;
+                const combinedTitle = `${c.arTitle} — ${c.enTitle}`;
+
+                const card = document.createElement("article");
+                card.className = "course-card";
+
+                const topDiv = document.createElement("div");
+                const headDiv = document.createElement("div");
+                headDiv.className = "course-head";
+                const tagSpan = document.createElement("span");
+                tagSpan.className = "tag";
+                tagSpan.textContent = badge;
+                headDiv.appendChild(tagSpan);
+
+                const titleAr = document.createElement("h3");
+                titleAr.className = "course-title-ar";
+                titleAr.textContent = c.arTitle;
+
+                const titleEn = document.createElement("div");
+                titleEn.className = "course-title-en";
+                titleEn.textContent = c.enTitle;
+
+                const ul = document.createElement("ul");
+                ul.className = "course-list";
+                c.arList.forEach(item => {
+                    const li = document.createElement("li");
+                    const itemAr = document.createElement("span");
+                    itemAr.className = "course-item-ar";
+                    itemAr.textContent = item.ar;
+
+                    const itemEn = document.createElement("span");
+                    itemEn.className = "course-item-en";
+                    itemEn.textContent = item.en;
+
+                    li.append(itemAr, itemEn);
+                    ul.appendChild(li);
+                });
+
+                topDiv.append(headDiv, titleAr, titleEn, ul);
+
+                const btnWrap = document.createElement("div");
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "btn btn-soft btn-sm";
+                btn.textContent = d.askCourseBtn;
+                btn.addEventListener("click", () => askCourse(combinedTitle));
+                btnWrap.appendChild(btn);
+
+                card.append(topDiv, btnWrap);
+                grid.appendChild(card);
+            });
+        }
+
+        function renderPrereqs() {
+            const grid = document.getElementById("prereqsGrid");
+            grid.innerHTML = "";
+            PREREQS_DATA.forEach(p => {
+                const card = document.createElement("article");
+                card.className = "prereq-card";
+
+                const tag = document.createElement("span");
+                tag.className = "step-num";
+                tag.textContent = `${p.arTag} • ${p.enTag}`;
+
+                const flow = document.createElement("div");
+                flow.className = "prereq-flow";
+
+                const fromBox = document.createElement("div");
+                fromBox.className = "prereq-box";
+                const fromAr = document.createElement("span");
+                fromAr.className = "prereq-ar";
+                fromAr.textContent = p.fromAr;
+                const fromEn = document.createElement("span");
+                fromEn.className = "prereq-en";
+                fromEn.textContent = p.fromEn;
+                fromBox.append(fromAr, fromEn);
+
+                const arrow = document.createElement("div");
+                arrow.className = "prereq-arrow";
+                arrow.textContent = p.arrowText;
+
+                const toBox = document.createElement("div");
+                toBox.className = "prereq-box";
+                const toAr = document.createElement("span");
+                toAr.className = "prereq-ar";
+                toAr.textContent = p.toAr;
+                const toEn = document.createElement("span");
+                toEn.className = "prereq-en";
+                toEn.textContent = p.toEn;
+                toBox.append(toAr, toEn);
+
+                flow.append(fromBox, arrow, toBox);
+                card.append(tag, flow);
+                grid.appendChild(card);
+            });
+        }
+
+        function getCalcItems(track, pct) {
+            const items = [];
+            if (track === "sci_math" || track === "sci_bio") {
+                const fee = track === "sci_math"
+                    ? (lang === "ar" ? "نحو 61,868 جنيه سنويًا" : "~61,868 EGP / year")
+                    : (lang === "ar" ? "نحو 64,268 جنيه سنويًا" : "~64,268 EGP / year");
+                items.push({
+                    title: lang === "ar" ? "كلية الحاسبات وتكنولوجيا المعلومات" : "Faculty of Computers & IT",
+                    min: 61,
+                    fee,
+                    ok: pct >= 61,
+                    detail: lang === "ar" ? "التخصصات: تكنولوجيا المعلومات، الذكاء الاصطناعي، علوم البيانات." : "Tracks: IT, Artificial Intelligence, Data Science."
+                });
+            }
+            items.push({
+                title: lang === "ar" ? "كلية إدارة الأعمال" : "Faculty of Business Administration",
+                min: 53,
+                fee: lang === "ar" ? "نحو 48,612 جنيه سنويًا" : "~48,612 EGP / year",
+                ok: pct >= 53,
+                detail: lang === "ar" ? "التخصصات: محاسبة، تسويق، تمويل واستثمار، سلاسل إمداد، نظم معلومات إدارية." : "Tracks: Accounting, Marketing, Finance, Supply Chain, MIS."
+            });
+            return items;
+        }
+
+        function renderCalc() {
+            const d = I18N[lang];
+            const track = document.getElementById("calcTrack").value;
+            const rawPct = parseFloat(document.getElementById("calcPct").value);
+            const pct = Number.isFinite(rawPct) ? Math.min(100, Math.max(0, rawPct)) : 0;
+            const container = document.getElementById("calcResults");
+            const items = getCalcItems(track, pct);
+
+            container.innerHTML = items.map(it => {
+                const pillClass = it.ok ? "status-pill" : "status-pill warn";
+                const pillText = it.ok ? d.calcEligible : d.calcBelow;
+                return `<div class="calc-item"><div class="calc-item-top"><strong>${escapeHtml(it.title)}</strong><span class="${pillClass}">${escapeHtml(pillText)}</span></div><p><strong>${escapeHtml(d.calcMinLbl)}</strong> ${escapeHtml(String(it.min))}% • <strong>${escapeHtml(d.calcFeeLbl)}</strong> ${escapeHtml(it.fee)}</p><p>${escapeHtml(it.detail)}</p></div>`;
+            }).join("");
+        }
+
+        function sendCalcToContact() {
+            const trackSelect = document.getElementById("calcTrack");
+            const trackLabel = trackSelect.selectedOptions[0].textContent;
+            const pct = document.getElementById("calcPct").value || "0";
+            const items = getCalcItems(trackSelect.value, parseFloat(pct) || 0);
+            const summary = items.map(i => `- ${i.title}: ${i.ok ? "متاح" : "أقل من الحد"} (${i.fee})`).join("\n");
+            document.getElementById("topic").value = "study";
+            const msgEl = document.getElementById("msg");
+            msgEl.value = `استفسار عن التنسيق والمصروفات في EELU — الشعبة: ${trackLabel}، النسبة: ${pct}%\n${summary}`;
+            refreshAutoReply();
+            document.getElementById("contact").scrollIntoView({ behavior: "smooth" });
+            msgEl.focus();
+        }
+
+        function generateSmartAnswer(rawQuestion) {
+            const q = rawQuestion.trim().toLowerCase();
+            if (!q) return I18N[lang].qaPromptEmpty;
+
+            if (/(ساعة|ساعات|معتمدة|gpa|معدل|تراكمي|credit|hours|credits)/i.test(q)) {
+                return lang === "ar"
+                    ? "الساعات المعتمدة (Credit Hours):\n• تقيس وزن كل مادة وساعات تدريسها وتحدد تقدمك نحو التخرج.\n• غالبًا تكون المادة 3 ساعات معتمدة، ويتحدد عدد الساعات المسموح بتسجيلها في الترم حسب اللائحة ومعدلك التراكمي (GPA).\n• المواد ذات الساعات الأعلى يكون تأثيرها أكبر في حساب المعدل الفصلي والتراكمي."
+                    : "Credit Hours:\n• Measure course weight and guide your progress toward graduation.\n• Many courses are 3 credits; your semester load follows faculty rules and your GPA.\n• Higher-credit courses carry more weight in semester and cumulative GPA calculations.";
+            }
+
+            if (/(تقفل|يقفل|تفتح|يفتح|متطلب|متطلبات|prerequisite|prerequisites|lock|block)/i.test(q)) {
+                return lang === "ar"
+                    ? "المواد التي تقفل أو تفتح مواد أخرى (Prerequisites):\n• بعض المواد تكون «متطلبًا سابقًا» لمادة لاحقة؛ أي أن عدم اجتيازها يمنع تسجيل المادة التي تعتمد عليها.\n• مثلًا: مادة برمجة أساسية قد تكون شرطًا لفتح «هياكل البيانات»، أو مادة أساسية تفتح مقررًا متقدمًا.\n• راجع قسم «خريطة المواد» قبل كل تسجيل لتفادي أي تأخير في خطتك الدراسية."
+                    : "Prerequisites (Courses That Lock or Unlock Others):\n• A prerequisite must be completed before taking courses that depend on it.\n• For example, programming fundamentals can lock Data Structures.\n• Checking the Prerequisite Map before registration avoids scheduling delays.";
+            }
+
+            if (/(امتحان|امتحانات|تقييم|درجات|أعمال سنة|كويز|رسوب|exam|exams|grading|grade|retake)/i.test(q)) {
+                return lang === "ar"
+                    ? "نظام الامتحانات والتقييم:\n• يعتمد على متابعة مستمرة تجمع بين أعمال السنة (مهام، كويزات، تطبيقات عملية) والاختبارات المقررة باللائحة.\n• الالتزام بتسليم المهام أولًا بأول يخفف الضغط وقت الامتحانات.\n• في حال الرسوب في مادة، تُعاد وفق لائحة الكلية ويظهر أثرها في المعدل حسب القواعد المعتمدة."
+                    : "Exams & Grading:\n• Combines continuous coursework (quizzes, assignments, practical tasks) and scheduled exams under faculty rules.\n• Completing tasks on time eases final exam pressure.\n• Retaking or re-examining failed courses follows faculty bylaws and GPA rules.";
+            }
+
+            if (/(سنة أولى|سنة تانية|سنة تالتة|سنة رابعة|أولى|تانية|تالتة|رابعة|مواد|مقرر|مقررات|منهج|هندرس|بندرس|محتوى|year 1|year 2|year 3|year 4|subjects|curriculum|syllabus)/i.test(q)) {
+                return lang === "ar"
+                    ? "توزيع المواد والمقررات في EELU (من سنة أولى إلى سنة رابعة):\n• سنة أولى وسنة تانية: التأسيس والبرمجة/المحاسبة وهياكل البيانات وقواعد البيانات والتسويق والتمويل.\n• سنة تالتة وسنة رابعة: هندسة البرمجيات والذكاء الاصطناعي والسحابة وسلاسل الإمداد والإدارة الاستراتيجية ومشروع التخرج.\n• جميعها معروضة بالعربي والإنجليزي في قسم «المواد»."
+                    : "Courses across Years 1–4 at EELU:\n• Years 1–2: Foundations, programming/accounting, data structures, databases, marketing, and finance.\n• Years 3–4: Software engineering, AI, cloud, supply chain, strategic management, and graduation project.\n• All listed in Arabic & English under Courses.";
+            }
+
+            if (/(مصاريف|فلوس|رسوم|مبلغ|جنيه|تنسيق|حد أدنى|مجموع|fees|tuition|cost|price|cutoff|minimum|gpa)/i.test(q)) {
+                return lang === "ar"
+                    ? "بحسب المؤشرات المعلنة لعام 2026/2027:\n• حاسبات وتكنولوجيا المعلومات: حد أدنى 61% — نحو 61,868 جنيه (علمي رياضة) و64,268 جنيه (علمي علوم).\n• إدارة الأعمال: حد أدنى 53% — نحو 48,612 جنيه سنويًا.\n• الشهادة معتمدة من المجلس الأعلى للجامعات."
+                    : "Based on 2026/2027 benchmarks:\n• Computers & IT: 61% minimum — ~61,868 EGP (Math) and ~64,268 EGP (Science).\n• Business Administration: 53% minimum — ~48,612 EGP/year.\n• Accredited by Egypt's Supreme Council of Universities.";
+            }
+
+            const stopWords = new Set(["فرع", "فروع", "جامعة", "مقر", "مركز", "فين", "مكان", "عنوان", "محافظة", "branch", "campus", "where", "location"]);
+            const tokens = q.replace(/[؟?.,!،]/g, "").split(/\s+/).filter(w => w.length >= 3 && !stopWords.has(w));
+            const matchedBranches = BRANCHES.filter(b => {
+                const hay = `${b.arName} ${b.enName} ${b.arLoc} ${b.enLoc}`.toLowerCase();
+                return tokens.some(t => hay.includes(t));
+            });
+
+            if (matchedBranches.length && /(فرع|فروع|مكان|فين|عنوان|محافظ|branch|campus|where|location)/i.test(q)) {
+                return matchedBranches.slice(0, 4).map(b =>
+                    `• ${lang === "ar" ? b.arName : b.enName}: ${lang === "ar" ? b.arLoc : b.enLoc}`
+                ).join("\n");
+            }
+
+            if (/(فرع|فروع|نظام|دراسة|أونلاين|مدمج|كليات|تخصص|branch|study|blended|faculty|track|major)/i.test(q)) {
+                return lang === "ar"
+                    ? "تعتمد EELU نظام التعلم المدمج بين المنصات الرقمية والتعلم الذاتي مع المتابعة والأنشطة في فروع ومراكز المحافظات، وتشمل كليات الحاسبات وتكنولوجيا المعلومات وإدارة الأعمال والدراسات التربوية."
+                    : "EELU uses blended learning combining online platforms and self-paced study with regional branch support across governorates, covering Computers & IT, Business Administration, and Educational Studies.";
+            }
+
+            return lang === "ar"
+                ? "بخصوص سؤالك عن (" + rawQuestion.trim() + "): يمكنك مراجعة قسم «مفاهيم الكلية» و«خريطة المواد»، أو إرسال سؤالك لسيف مباشرة."
+                : "Regarding (" + rawQuestion.trim() + "): check Key Concepts and the Prerequisite Map, or send your question to Saif.";
+        }
+
+        function handleInstantAsk(e) {
+            e.preventDefault();
+            const input = document.getElementById("instantQuestion");
+            document.getElementById("instantAnswer").textContent = generateSmartAnswer(input.value);
+        }
+
+        function presetAsk(index) {
+            const d = I18N[lang];
+            const keys = ["qaChip1", "qaChip2", "qaChip3", "qaChip4"];
+            const questionText = d[keys[index]] || "";
+            const input = document.getElementById("instantQuestion");
+            input.value = questionText;
+            document.getElementById("instantAnswer").textContent = generateSmartAnswer(questionText);
+        }
+
+        function sendQaToContact() {
+            const qText = document.getElementById("instantQuestion").value.trim();
+            const aText = document.getElementById("instantAnswer").textContent.trim();
+            document.getElementById("topic").value = "study";
+            const msgEl = document.getElementById("msg");
+            msgEl.value = qText ? `سؤال عن EELU: ${qText}\nالرد التلقائي: ${aText}` : aText;
+            refreshAutoReply();
+            document.getElementById("contact").scrollIntoView({ behavior: "smooth" });
+            msgEl.focus();
+        }
+
+        function isUnwantedNote(item) {
+            const combined = `${item.arTitle || ""} ${item.enTitle || ""} ${item.arBody || ""} ${item.enBody || ""}`;
+            return /لخص ماده الهيومن|لخص الهيومن/i.test(combined);
+        }
+
+        function loadNotes() {
+            try {
+                const raw = localStorage.getItem(NOTES_STORAGE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed)) {
+                        const filtered = parsed.filter(item => !isUnwantedNote(item));
+                        if (filtered.length !== parsed.length) {
+                            localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(filtered));
+                        }
+                        if (filtered.length) return filtered;
+                    }
+                }
+            } catch (_) {}
+            return DEFAULT_NOTES.slice();
+        }
+
+        function saveNotes() {
+            try { localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(notes)); } catch (_) {}
+        }
+
+        function detectCategory(text) {
+            const lower = text.toLowerCase();
+            if (/(إدارة|محاسب|تسويق|تمويل|سلاسل|أعمال|business|accounting|marketing|finance|mis)/i.test(lower)) {
+                return "math";
+            }
+            if (/(منح|تقديم|مدمج|فرع|فروع|خط ساخن|16541|grant|scholarship|admission|blended|branch)/i.test(lower)) {
+                return "ai";
+            }
+            return "code";
+        }
+
+        function summarizeText(rawText) {
+            const clean = rawText.replace(/\r\n/g, "\n").trim();
+            if (!clean) return "";
+            const parts = clean
+                .split(/(?:\n+|(?<=[.!?؟؛])\s+)/)
+                .map(s => s.replace(/^[-•*▪●\d.)]+\s*/, "").trim())
+                .filter(Boolean);
+
+            const scored = parts.map((sentence, idx) => {
+                const words = sentence.split(/\s+/).filter(Boolean);
+                let score = 0;
+                if (idx === 0) score += 3;
+                if (words.length >= 4 && words.length <= 26) score += 2;
+                if (/(مهم|أساس|هدف|نتيجة|قاعدة|خلاصة|أهم|خطو|key|important|main|result|summary|goal|rule|step)/i.test(sentence)) {
+                    score += 3;
+                }
+                if (/[=+\-*/%<>]|\d+/.test(sentence)) score += 1;
+                return { sentence, score, idx };
+            });
+
+            const limit = Math.min(4, Math.max(1, scored.length));
+            const picked = scored
+                .slice()
+                .sort((a, b) => (b.score - a.score) || (a.idx - b.idx))
+                .slice(0, limit)
+                .sort((a, b) => a.idx - b.idx);
+
+            return picked
+                .map(item => {
+                    const shortLine = item.sentence.length > 155
+                        ? item.sentence.slice(0, 152).replace(/\s+\S*$/, "") + "..."
+                        : item.sentence;
+                    return `• ${shortLine}`;
+                })
+                .join("\n");
+        }
+
+        function autoSummarizeInput() {
+            const d = I18N[lang];
+            const bodyEl = document.getElementById("noteBody");
+            const subEl = document.getElementById("noteSubject");
+            const catEl = document.getElementById("noteCat");
+            const fbEl = document.getElementById("noteFb");
+            const raw = bodyEl.value.trim();
+
+            if (!raw) {
+                fbEl.textContent = d.noteNeedText;
+                bodyEl.focus();
+                return;
+            }
+
+            const summary = summarizeText(raw);
+            if (!subEl.value.trim()) {
+                const firstLine = raw.split(/\n+/)[0].replace(/^[-•*▪●\d.)]+\s*/, "").trim();
+                const shortTitle = firstLine.length > 48 ? firstLine.slice(0, 45).replace(/\s+\S*$/, "") + "..." : firstLine;
+                subEl.value = shortTitle || d.autoTopicLabel;
+            }
+            catEl.value = detectCategory(raw);
+            bodyEl.value = summary;
+            fbEl.textContent = d.noteSummarized;
+        }
+
+        function askGuideQuestion() {
+            const d = I18N[lang];
+            document.getElementById("topic").value = "study";
+            const msgEl = document.getElementById("msg");
+            msgEl.value = d.gMsgPrefix;
+            refreshAutoReply();
+            document.getElementById("contact").scrollIntoView({ behavior: "smooth" });
+            msgEl.focus();
+        }
+
+        function selectBranch(branchName) {
+            const d = I18N[lang];
+            document.getElementById("topic").value = "study";
+            const msgEl = document.getElementById("msg");
+            msgEl.value = `${d.branchMsgPrefix}${branchName}`;
+            refreshAutoReply();
+            document.getElementById("contact").scrollIntoView({ behavior: "smooth" });
+            msgEl.focus();
+        }
+
+        function renderBranches() {
+            const d = I18N[lang];
+            const q = (document.getElementById("branchSearch").value || "").trim().toLowerCase();
+            const grid = document.getElementById("branchesGrid");
+            const filtered = BRANCHES.filter(b => {
+                const name = (lang === "ar" ? b.arName : b.enName).toLowerCase();
+                const loc = (lang === "ar" ? b.arLoc : b.enLoc).toLowerCase();
+                return !q || name.includes(q) || loc.includes(q);
+            });
+            grid.innerHTML = "";
+            filtered.forEach(b => {
+                const title = lang === "ar" ? b.arName : b.enName;
+                const loc = lang === "ar" ? b.arLoc : b.enLoc;
+
+                const card = document.createElement("article");
+                card.className = "branch-card";
+
+                const info = document.createElement("div");
+                const h3 = document.createElement("h3");
+                h3.textContent = title;
+                const p = document.createElement("p");
+                p.textContent = loc;
+                info.append(h3, p);
+
+                const btnWrap = document.createElement("div");
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "btn btn-soft";
+                btn.textContent = d.askBranch;
+                btn.addEventListener("click", () => selectBranch(title));
+                btnWrap.appendChild(btn);
+
+                card.append(info, btnWrap);
+                grid.appendChild(card);
+            });
+        }
+
+        function catLabel(cat) {
+            const d = I18N[lang];
+            return cat === "math" ? d.fMath : cat === "ai" ? d.fAi : d.fCode;
+        }
+
+        async function copyNoteById(id) {
+            const d = I18N[lang];
+            const item = notes.find(n => n.id === id);
+            if (!item) return;
+            const title = lang === "ar" ? (item.arTitle || item.enTitle) : (item.enTitle || item.arTitle);
+            const body = lang === "ar" ? (item.arBody || item.enBody) : (item.enBody || item.arBody);
+            await navigator.clipboard.writeText(`${title}\n${body}`);
+            document.getElementById("noteActionFb").textContent = d.noteCopied;
+        }
+
+        function deleteNoteById(id) {
+            const d = I18N[lang];
+            notes = notes.filter(n => n.id !== id);
+            if (!notes.length) notes = DEFAULT_NOTES.slice();
+            saveNotes();
+            renderNotes();
+            document.getElementById("noteActionFb").textContent = d.noteDeleted;
+        }
+
+        function renderNotes() {
+            const d = I18N[lang];
+            const grid = document.getElementById("notesGrid");
+            const list = notes.filter(n => !isUnwantedNote(n) && (noteCat === "all" || n.cat === noteCat));
+            grid.innerHTML = "";
+            list.forEach(n => {
+                const title = lang === "ar" ? (n.arTitle || n.enTitle) : (n.enTitle || n.arTitle);
+                const body = lang === "ar" ? (n.arBody || n.enBody) : (n.enBody || n.arBody);
+
+                const card = document.createElement("article");
+                card.className = "note-card";
+
+                const top = document.createElement("div");
+                const topBar = document.createElement("div");
+                topBar.className = "note-top";
+                const tag = document.createElement("span");
+                tag.className = "tag";
+                tag.textContent = catLabel(n.cat);
+                topBar.appendChild(tag);
+
+                const h3 = document.createElement("h3");
+                h3.style.marginTop = "8px";
+                h3.textContent = title;
+
+                const p = document.createElement("p");
+                p.textContent = body;
+                top.append(topBar, h3, p);
+
+                const actions = document.createElement("div");
+                actions.className = "note-actions";
+
+                const copyBtn = document.createElement("button");
+                copyBtn.type = "button";
+                copyBtn.className = "btn btn-soft btn-sm";
+                copyBtn.textContent = d.copyNoteBtn;
+                copyBtn.addEventListener("click", () => copyNoteById(n.id));
+
+                const delBtn = document.createElement("button");
+                delBtn.type = "button";
+                delBtn.className = "btn btn-soft btn-sm";
+                delBtn.textContent = d.deleteNoteBtn;
+                delBtn.addEventListener("click", () => deleteNoteById(n.id));
+
+                actions.append(copyBtn, delBtn);
+                card.append(top, actions);
+                grid.appendChild(card);
+            });
+        }
+
+        function setNoteCat(cat, btn) {
+            noteCat = cat;
+            btn.parentElement.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            renderNotes();
+        }
+
+        function addNote(e) {
+            e.preventDefault();
+            const sub = document.getElementById("noteSubject").value.trim();
+            const rawBody = document.getElementById("noteBody").value.trim();
+            const cat = document.getElementById("noteCat").value;
+            if (!sub || !rawBody) return;
+            const formattedBody = rawBody.startsWith("•") ? rawBody : summarizeText(rawBody);
+            notes.unshift({ id: "n_" + Date.now(), cat, arTitle: sub, enTitle: sub, arBody: formattedBody, enBody: formattedBody });
+            saveNotes();
+            renderNotes();
+            e.target.reset();
+            document.getElementById("noteFb").textContent = I18N[lang].noteSaved;
+        }
+
+        function renderThemeBtn() {
+            const d = I18N[lang];
+            const btn = document.getElementById("themeBtn");
+            const label = theme === "dark" ? d.lightTitle : d.darkTitle;
+            btn.textContent = theme === "dark" ? "☀" : "☾";
+            btn.setAttribute("aria-label", label);
+            btn.setAttribute("title", label);
+        }
+
+        function getAutoReplyText() {
+            const d = I18N[lang];
+            const topicKey = document.getElementById("topic").value;
+            const rawName = document.getElementById("name").value.trim() || d.defaultName;
+            const template = d.autoReplyByTopic[topicKey] || d.autoReplyByTopic.code;
+            return template.replace("{name}", rawName);
+        }
+
+        function showAutoReply() {
+            autoReplyVisible = true;
+            const box = document.getElementById("autoReplyBox");
+            document.getElementById("autoReplyText").textContent = getAutoReplyText();
+            box.classList.add("show");
+        }
+
+        function refreshAutoReply() {
+            if (autoReplyVisible) {
+                document.getElementById("autoReplyText").textContent = getAutoReplyText();
+            }
+        }
+
+        function renderLang() {
+            const d = I18N[lang];
+            document.title = d.pageTitle;
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+            document.getElementById("langBtn").textContent = d.lang;
+            document.querySelectorAll("[data-i18n]").forEach(el => {
+                const k = el.dataset.i18n;
+                if (d[k]) el.textContent = d[k];
+            });
+            document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+                const k = el.dataset.i18nPlaceholder;
+                if (d[k]) el.placeholder = d[k];
+            });
+            const qInput = document.getElementById("instantQuestion");
+            const ansBox = document.getElementById("instantAnswer");
+            ansBox.textContent = qInput.value.trim() ? generateSmartAnswer(qInput.value) : d.qaWelcome;
+            renderThemeBtn();
+            renderCourses();
+            renderPrereqs();
+            renderCalc();
+            renderBranches();
+            renderNotes();
+            document.getElementById("heroWa").href = waLink(d.hi);
+            document.getElementById("footWa").href = waLink(d.hi);
+            refreshAutoReply();
+        }
+
+        function toggleLang() { lang = lang === "ar" ? "en" : "ar"; renderLang(); }
+        function toggleTheme() { theme = theme === "light" ? "dark" : "light"; document.documentElement.dataset.theme = theme; renderThemeBtn(); }
+
+        function talkBot() {
+            const say = I18N[lang].botSay;
+            document.getElementById("botSay").textContent = say[botIdx++ % say.length];
+            const btn = document.getElementById("botBtn");
+            btn.classList.remove("wave"); void btn.offsetWidth; btn.classList.add("wave");
+        }
+
+        function openSrv(key, el) {
+            lastFocus = el || document.activeElement;
+            activeSrv = key;
+            const d = I18N[lang];
+            const title = d[key === "code" ? "s1t" : key === "ai" ? "s2t" : "s3t"];
+            const desc = d[key === "code" ? "s1d" : key === "ai" ? "s2d" : "s3d"];
+            document.getElementById("mTitle").textContent = title;
+            document.getElementById("mDesc").textContent = desc;
+            document.getElementById("modal").classList.add("open");
+        }
+
+        function closeModal(e, force) {
+            if (force || (e && e.target && e.target.id === "modal")) {
+                document.getElementById("modal").classList.remove("open");
+                if (lastFocus) lastFocus.focus();
+            }
+        }
+
+        document.addEventListener("keydown", e => {
+            if (e.key === "Escape" && document.getElementById("modal").classList.contains("open")) {
+                closeModal(null, true);
+            }
+        });
+
+        function fillTopic() {
+            document.getElementById("topic").value = activeSrv;
+            refreshAutoReply();
+            closeModal(null, true);
+            document.getElementById("contact").scrollIntoView({ behavior: "smooth" });
+            document.getElementById("msg").focus();
+        }
+
+        function buildMsg() {
+            const name = document.getElementById("name").value.trim() || "SF";
+            const topic = document.getElementById("topic").selectedOptions[0].textContent;
+            const msg = document.getElementById("msg").value.trim();
+            const reply = getAutoReplyText();
+            return `${name} (${topic}):\n${msg}\n\n[${I18N[lang].autoReplyPrefix}]: ${reply}`;
+        }
+
+        function sendMail() {
+            showAutoReply();
+            const name = document.getElementById("name").value.trim() || "Visitor";
+            const topic = document.getElementById("topic").selectedOptions[0].textContent;
+            window.open(mailLink(`${topic} - ${name}`, buildMsg()), "_blank", "noopener,noreferrer");
+        }
+
+        async function copyMsg() {
+            showAutoReply();
+            await navigator.clipboard.writeText(buildMsg());
+            document.getElementById("fb").textContent = I18N[lang].copied;
+        }
+
+        document.getElementById("waText").textContent = "+" + PHONE;
+        document.getElementById("emText").textContent = EMAIL;
+        renderLang();
+    </script>
+</body>
+</html>
